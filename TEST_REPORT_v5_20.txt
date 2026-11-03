@@ -1,0 +1,20 @@
+MY DAY v5.20 — Chromium 自動化測試報告
+
+測試環境：Chromium headless，使用頁面內容載入、外部請求封鎖（不是即時資料驗收）。
+
+視窗測試：1194×834、834×1194、1920×1080、1366×768、430×932；另測試 1194×834 減少動態效果。
+全部測試沒有水平方向溢出，也沒有頁面 JavaScript 例外。
+
+[PASS] 點擊時間 Widget，24 小時制 → 12 小時制 → 24 小時制。
+[PASS] 12 小時制顯示 AM/PM；切回時隱藏。
+[PASS] 一般動態偏好下的時鐘數字 CSS 動畫（clock-format-enter）。
+[PASS] 兩個計時按鈕均有按壓／回彈 CSS 動畫（timer-control-feedback）。
+[PASS] 重設按鈕 SVG 旋轉效果（timer-reset-rotate）。
+[PASS] 開始後 data-running=true；重設後 data-running=false。
+[PASS] Chromium 觸控模擬的 tap 能觸發按鈕和時鐘切換。
+[PASS] 在 prefers-reduced-motion: reduce 時，以上動畫為 none，操作仍正常。
+[PASS] Node.js JavaScript 語法檢查。
+
+限制：未在真實 iPad Safari／Windows Edge 硬體上驗證；外部 HKO、KMB、TradingView 等即時資料連線未驗收。
+
+只更改操作動畫，不更改其他資料來源、提醒、重要日子、月曆及捷徑儲存格式。

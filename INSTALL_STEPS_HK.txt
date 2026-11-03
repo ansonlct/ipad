@@ -1,0 +1,13 @@
+MY DAY v5.20 — 安裝及互動測試（香港時間 UTC+08:00）
+
+1. 先備份網站舊版 index.html。
+2. 如只需更新首頁，下載 MyDay_v5_20_index.html，改名 index.html。
+3. 將 index.html 上傳 GitHub Repository 根目錄並 Commit，等待 Pages 完成部署。
+4. iPad Safari / Windows Edge 或 Chrome 重新整理，確認頁尾為 MY DAY v5.20。
+5. 點擊時間卡片：24 小時制與 12 小時制（AM/PM）交替；觀察數字淡入／輕微縮放動畫。外圍秒鐘刻線不受影響。
+6. 計時器點擊開始、暫停、重設兩個圖示：按下瞬間縮小，釋放後短暫回彈／邊框反饋。開始鍵運行時仍切換為暫停圖示。
+7. 可透過 Windows 鍵盤 Tab 移至按鈕，再按 Enter / Space 測試回饋和 focus-visible。
+8. Windows / iPad 系統啟用減少動態效果時，動畫會停止，但按鈕顏色和功能仍有效。
+9. 如版面有誤，可還原備份的 index.html 再 Commit 回滾。
+
+版本 v5.20 僅調整動畫與視覺回饋，不需要清除 localStorage 或修改資料來源。
