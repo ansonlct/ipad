@@ -1,0 +1,8 @@
+My Day v5.32 — 安裝步驟（香港）
+1. 備份 GitHub Pages repository 現有 `index.html` 及 `scripts/fetch_news.py`。
+2. 從 ZIP 的 `ipad-main/` 複製 `index.html` 到 repository 根目錄。
+3. 從 ZIP 的 `ipad-main/scripts/` 複製 `fetch_news.py` 到 repository 的 `scripts/`。
+4. Commit / Push main，待 GitHub Actions 完成 Pages 部署。
+5. 使用 ?v=532 開啟，確認 My Day v5.32，檢查 21 Widgets、提醒、重要日子、圖片、新聞及天氣。
+6. 回滾：還原兩個檔案到原本 v5.31 Git commit。不要清除瀏覽器網站資料。
+完整維護及風險說明：MyDay_Project_Handoff_v5_32.txt。

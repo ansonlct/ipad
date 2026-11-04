@@ -1,3 +1,35 @@
+# 最新：My Day v5.31。請先閱讀 MyDay_Project_Handoff_v5_31.txt，並使用本 ZIP ipad-main/index.html。圖片 Hover 只加深中央，SVG 圖示取代 ▧；其它 21 Widget 不變。
+
+# 最新補充：My Day v5.30（2026-11-05 HKT）
+
+**最新入口是同 ZIP 內 `ipad-main/index.html`；最新版指引 `MyDay_Project_Handoff_v5_30.txt`。** 三個空白 Widget 共用 `.unified-empty-cue` CSS，文字分別是「記錄我的提醒」、「記錄重要日子」、「珍藏一刻」，次文字一律「按空白位置新增」。同一字體、字重、位置，hover 時文字／圖示統一變深，並支援深色模式及鍵盤 focus；其他 21 Widget 功能、v5.29 已上傳照片的 hover controls 不變。Chromium 離線 768/768 PASS；仍需真 iPad Safari 與實際部署驗收。
+
+---
+
+**最新交接 v5.29（2026-11-05 HKT）**：優先閱讀 `MyDay_Project_Handoff_v5_29.txt`。已上傳圖片時：默認隱藏左上主題名和右上 ×；鼠標移入時同時顯示，離開隱藏。iPad 無 Hover：首次點相片顯示控制，第二次點相片換圖、點 × 刪除；鍵盤 Tab 仍可用。21 個 Widget、正方形裁切、localStorage key `myday.photo.square.v1`、全部 v5.28 功能不變。Chromium 模擬回歸及新操作共 257/257 PASS；未做 iPad Safari 實機及正式 API。唯一最新程式為此 ZIP `ipad-main/index.html`。
+
+---
+
+**最新交接 v5.28（2026-11-05 HKT）**：請優先閱讀 `MyDay_Project_Handoff_v5_28.txt`。本版新增第 21 個「圖片」正方形 Widget，未選相片顯示「按空白位置新增圖像」，點擊選圖、中心裁剪為正方形、圖片滿版、換圖及移除。圖片儲存在 localStorage key `myday.photo.square.v1`（只有本機、不同裝置不會同步），既有 20 個 Widget、氣壓上移修正、能見度字幕移除、日照全日曲線及原有個人資料 key 均保留。Chromium 回歸 123/123 + 圖片 Widget 45/45 = 168/168 PASS；無真實 iPad Safari 或 live API 驗收。最新版唯一基準是本 ZIP `ipad-main/index.html`。
+
+---
+
+**最新交接 v5.27（2026-11-05 HKT）**：先讀 `MyDay_Project_Handoff_v5_27.txt`，再參考以下歷史內容。本版解決 v5.26 氣壓半圓刻度可見部分偏低的問題：整個刻度 SVG 與低／高標籤按卡片尺寸一起上移；數字、箭頭保持原位。額外針對刻度本身的幾何測試及 7 尺寸回歸共 123/123 PASS（Chromium 模擬，非 iPad Safari）。最新版只能以 ZIP 內的 `ipad-main/index.html` 為準。
+
+---
+
+**最新交接 v5.26（2026-11-05 HKT）：** 請優先閱讀 `MyDay_Project_Handoff_v5_26.txt`。氣壓與趨勢箭頭不重疊；能見度沒有「模型預估視程」字幕；日照日出前/白天/日落後全日三段相接，圓點按 HKT 每分鐘行走。完整 Chromium mock 驗證 102/102 PASS，非 Safari/live API。以 ZIP 中 `ipad-main/index.html` 作為最新基準。
+
+---
+
+# MY DAY v5.25 — 2026-11-05 最新交接（優先於 v5.24）
+
+**本 ZIP 最新基準：v5.25；以 `ipad-main/index.html` 作為唯一生效首頁。** 此版直接在用戶提供的 v5.24 版本上修改氣壓、能見度、日照三個 Widget：氣壓錶盤與數值水平置中並為小尺寸卡片修整；能見度使用青綠山景、置中讀數、分級描述（模型估算，並非實測）；日照在日落後加向下的黃昏線及夜間標題對比修正。其餘 Widget／本機儲存／部署流程不變。
+
+附有 `MyDay_Project_Handoff_v5_25.txt`、`CHANGELOG_v5_25.txt`、`TEST_REPORT_v5_25.txt`、`INSTALL_STEPS_HK_v5_25.txt` 和 `tests/acceptance_v5_25.py`。Chromium mock 59/59 PASS，未作 iPad Safari 實機及 Live API 驗收；模擬預覽不是實時數據。**任何與舊交接不同的內容，以本 v5.25 段落為準。**
+
+---
+
 # MY DAY v5.24 — 2026-11-04 最新交接（優先於所有舊版）
 
 **最新基準：v5.24，請只從此 ZIP 的 `ipad-main/index.html` 繼續開發。** v5.23 及以下文件只作歷史追溯，如有不同以本段為準。

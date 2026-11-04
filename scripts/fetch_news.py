@@ -9,7 +9,6 @@ from __future__ import annotations
 import datetime as dt
 import email.utils
 import json
-import os
 from pathlib import Path
 import re
 import sys
@@ -43,6 +42,40 @@ def to_iso(raw: str) -> str | None:
         return None
 
 
+
+def is_official_news_url(url: str) -> bool:
+    # Require HTTPS on official RTHK; reject lookalikes and embedded credentials.
+    try:
+        parsed = urllib.parse.urlsplit(url)
+        host = (parsed.hostname or '').lower()
+        port = parsed.port  # Access also validates malformed port syntax.
+        return (parsed.scheme == 'https' and not parsed.username and
+                not parsed.password and port in (None, 443) and
+                (host == 'rthk.hk' or host.endswith('.rthk.hk')))
+    except (ValueError, TypeError):
+        return False
+
+
+def cached_articles(raw: object, limit: int = 15) -> list[dict]:
+    # Retain offline fallback only for valid official source records.
+    if not isinstance(raw, list):
+        return []
+    valid = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        title, url = item.get('title'), item.get('url')
+        if not isinstance(title, str) or not title.strip() or not isinstance(url, str):
+            continue
+        if not is_official_news_url(url):
+            continue
+        date = item.get('date')
+        valid.append({'title': title[:190], 'url': url,
+                      'date': date if isinstance(date, str) else None})
+        if len(valid) >= limit:
+            break
+    return valid
+
 def parse_rss(payload: bytes, limit: int = 15) -> list[dict]:
     xml = ET.fromstring(payload)
     articles = []
@@ -51,10 +84,7 @@ def parse_rss(payload: bytes, limit: int = 15) -> list[dict]:
         title = re.sub(r'\s+', ' ', text(item, 'title')).strip()
         url = text(item, 'link')
         # Only external HTTPS articles from RTHK's official sites are published.
-        parsed = urllib.parse.urlsplit(url)
-        if parsed.scheme != 'https' or not parsed.hostname or not (
-            parsed.hostname == 'rthk.hk' or parsed.hostname.endswith('.rthk.hk')
-        ):
+        if not is_official_news_url(url):
             continue
         if not title or url in seen:
             continue
@@ -78,14 +108,20 @@ def download(url: str) -> bytes:
     with urllib.request.urlopen(req, timeout=18) as resp:
         if resp.status != 200:
             raise ValueError(f'HTTP {resp.status}')
-        return resp.read(1_500_001)[:1_500_000]
+        payload = resp.read(1_500_001)
+        if len(payload) > 1_500_000:
+            raise ValueError('RSS exceeds 1.5 MB limit')
+        return payload
 
 
 def main() -> int:
     current = {}
     if OUT.exists():
         try:
-            current = json.loads(OUT.read_text(encoding='utf-8')).get('categories', {})
+            existing = json.loads(OUT.read_text(encoding='utf-8'))
+            current = existing.get('categories', {}) if isinstance(existing, dict) else {}
+            if not isinstance(current, dict):
+                current = {}
         except (ValueError, OSError):
             current = {}
 
@@ -99,7 +135,7 @@ def main() -> int:
             categories[label] = items
             print(f'{label}: {len(items)} articles', flush=True)
         except Exception as error:
-            categories[label] = current.get(label, [])
+            categories[label] = cached_articles(current.get(label, []))
             failures.append(f'{label}: {error}')
             print(f'WARNING: {failures[-1]}', file=sys.stderr, flush=True)
 

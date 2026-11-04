@@ -1,3 +1,52 @@
+## 最新 — My Day v5.32（2026-11-05 HKT）
+本版保守審視 v5.31 程式，維持 **21 個 Widget** 及所有原有 CSS。改善本機資料容錯、港台新聞來源白名單、重複空白提示、時間 formatter，移除確定未使用的舊市場繪圖函式。使用 `MyDay_Project_Handoff_v5_32.txt` 作為最新交接，部署需更新 `index.html` 和 `scripts/fetch_news.py`。本機 Chromium 離線驗證 **851/851 PASS**，不代表 Safari 真機／Live API 驗證。
+
+---
+
+## Latest — My Day v5.31 (2026-11-05 HKT)
+
+Photo Widget hover now shades only the inset cue like Reminders and Important Dates. The photo title uses an inline SVG picture icon instead of ▧. All 21 widgets preserved. `MyDay_Project_Handoff_v5_31.txt` is the latest. Local Chromium verification: 390/390 PASS.
+
+---
+
+## Latest — My Day v5.30 (2026-11-05 HKT)
+
+**21 Widgets**. The empty states of My Reminders, Important Dates, and Photo now share the same typography, icon size, placement and darker-on-hover treatment. Prompts: 「記錄我的提醒／按空白位置新增」, 「記錄重要日子／按空白位置新增」, 「珍藏一刻／按空白位置新增」. Existing content and uploaded-photo behavior are unchanged. See `MyDay_Project_Handoff_v5_30.txt`, `INSTALL_STEPS_HK_v5_30.txt`, `TEST_REPORT_v5_30.txt`. Chromium local test **768/768 PASS**; no real iPad Safari or public site validation.
+
+---
+
+## Latest — My Day v5.29 (2026-11-05 HKT)
+
+**21 Widgets**. When a picture has been uploaded, the photo Widget's upper-left heading and upper-right × control are hidden by default; both appear on mouse/trackpad hover and disappear on mouseout. On touch-only devices the first tap reveals controls; a second tap replaces the image. Keyboard users can Tab to the remove button. Empty-state invitation, square crop, one-image browser-local storage, and original Widgets are unchanged. Latest handoff `MyDay_Project_Handoff_v5_29.txt`; install `INSTALL_STEPS_HK_v5_29.txt`; mock test report `TEST_REPORT_v5_29.txt`. Chromium synthetic tests **257/257 PASS**; no actual iPad Safari or public deployment test.
+
+---
+
+## Latest — My Day v5.28 (2026-11-05 HKT)
+
+**21 Widgets** including a single square 「圖片」 Widget. Click the empty card to select a picture; the image is center-cropped into a square, stored in this browser only, and can be replaced or removed. No external image upload. Current homepage is `index.html`; latest handoff `MyDay_Project_Handoff_v5_28.txt`, install `INSTALL_STEPS_HK_v5_28.txt`, tests `TEST_REPORT_v5_28.txt`. Chromium synthetic/mock tests **168/168 PASS**, not actual iPad Safari or public GitHub Pages test.
+
+---
+
+## Latest version — My Day v5.27 (2026-11-05 HKT)
+
+The pressure semi-circular **visible tick ring**, not only its SVG bounding box, is now vertically centered within each square Widget; low/high labels rise with it. The readout and arrow remain separate, preventing collisions. No changes to v5.26 visibility or sun curve behavior. Read `MyDay_Project_Handoff_v5_27.txt` and `INSTALL_STEPS_HK_v5_27.txt`. Chromium mock 123/123 PASS; no real Safari/live API test.
+
+---
+
+## Latest version — My Day v5.26 (2026-11-05 HKT)
+
+The active homepage is `index.html`. For the latest handoff, see `MyDay_Project_Handoff_v5_26.txt`. Pressure instrument spacing, a clean visibility reading, and a full 24-hour sunrise/sunset dot path were improved. Mock Chromium test: 102/102 PASS; iPad Safari and live APIs not yet verified.
+
+---
+
+# My Day v5.25 — 香港 Dashboard（iPad / Windows）
+
+最新基準 v5.25（20 個 Widget）：改善氣壓置中、能見度視覺效果及日落後下降曲線。保留 v5.24 統一標題與 v5.23 統一來源 footer，保留原有分頁及個人化資料。部署方式不變：更新 GitHub Pages 根目錄 `index.html`。
+
+先閱讀 `MyDay_Project_Handoff_v5_25.txt`、`INSTALL_STEPS_HK_v5_25.txt` 和 `TEST_REPORT_v5_25.txt`。模擬截圖不是即時數據。
+
+---
+
 # My Day v5.24 — 香港 Dashboard（iPad / Windows）
 
 **最新版本 v5.24，20 個 Widget。** 本次按「相對濕度」統一所有 16 個有標題 Widget 的字體、大小、字重、透明度和左上角位置。保留 v5.23 統一來源 footer、九巴 `KMB · HH:mm`，以及 v5.22 四個天氣 Widget、右側分頁點與滑動動畫。

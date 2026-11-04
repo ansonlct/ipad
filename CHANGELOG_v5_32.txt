@@ -1,0 +1,9 @@
+My Day v5.32 — 保守程式碼安全及維護審視（HKT 2026-11-05）
+- 保留 21 Widget 及全部原有 CSS（逐字相同）、原有 DOM 卡片順序。
+- 加入壞掉的本機提醒/重要日子資料防呆，不修改有效資料的儲存鍵。
+- 提醒與重要日子共用空白 HTML 提示生成器，畫面效果不變。
+- 重用時間 Intl formatter，避免高頻渲染反覆建立。
+- RTHK 連結前端 + GitHub Action RSS 爬取及快取雙層 HTTPS 官方主機驗證。
+- 明確拒絕超過 1.5MB 的 RSS；清理未使用的舊 HSI SVG 繪圖函式。
+- Chromium 離線測試組合 851/851 PASS，非真實 iPad Safari/Live API 安全保證。
+- 風險與回滾：見 MyDay_Project_Handoff_v5_32.txt。
