@@ -1,0 +1,21 @@
+My Day v5.24 — 自動化驗收
+日期：2026-11-04
+環境：Linux Chromium / Playwright；HTML 直接載入；外部 API 阻截或模擬回應。
+
+1. 標題統一專項：53/53 PASS
+   七種 viewport：1920×1080、1366×768、1194×834、1024×768、820×1180、390×844、320×640。
+   每尺寸核查：16 個有標題 Widget；標題行相對卡片 x/y 各 11px；font 12px、weight 760、opacity 1、字距 -0.3px；標題不超出卡片、沒有與右側按鈕／副資訊碰撞；圖示 24px；分頁數量；沒有 JavaScript pageerror。
+   額外：字體設定「小」10.92px、「大」13.56px（全部標題同步）；暗色模式字體及透明度一致、天氣卡維持白色可讀標題。
+   執行：python tests/acceptance_v5_24.py
+
+2. 舊版 v5.23 回歸：55/55 PASS
+   包含 12 個資料來源 footer 位置、KMB 更新時間、HKO 氣象／提醒日期、無網路時不偽造時間、分頁導航及計時器。
+   執行：python tests/acceptance_v5_23.py
+
+3. 介面預覽
+   PREVIEW_1194x834_MockData.png, PREVIEW_1024x768_MockData.png,
+   PREVIEW_820x1180_MockData.png, PREVIEW_390x844_MockData.png。
+   全部 API 數據為 mock；截圖只作排版展示。
+
+4. 未能驗證
+   真實 iPad Safari / iOS PWA 手勢流暢度與字體回退、正式部署後的網絡與第三方 API 可用性。這些項目須實機驗收。

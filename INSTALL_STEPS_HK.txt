@@ -1,13 +1,31 @@
-MY DAY v5.20 — 安裝及互動測試（香港時間 UTC+08:00）
+My Day v5.24 安裝／驗收提示（2026-11-04）
 
-1. 先備份網站舊版 index.html。
-2. 如只需更新首頁，下載 MyDay_v5_20_index.html，改名 index.html。
-3. 將 index.html 上傳 GitHub Repository 根目錄並 Commit，等待 Pages 完成部署。
-4. iPad Safari / Windows Edge 或 Chrome 重新整理，確認頁尾為 MY DAY v5.20。
-5. 點擊時間卡片：24 小時制與 12 小時制（AM/PM）交替；觀察數字淡入／輕微縮放動畫。外圍秒鐘刻線不受影響。
-6. 計時器點擊開始、暫停、重設兩個圖示：按下瞬間縮小，釋放後短暫回彈／邊框反饋。開始鍵運行時仍切換為暫停圖示。
-7. 可透過 Windows 鍵盤 Tab 移至按鈕，再按 Enter / Space 測試回饋和 focus-visible。
-8. Windows / iPad 系統啟用減少動態效果時，動畫會停止，但按鈕顏色和功能仍有效。
-9. 如版面有誤，可還原備份的 index.html 再 Commit 回滾。
+1. 完整 ZIP 解壓後，GitHub Pages repo 使用 `ipad-main/` 內的最新檔案；只想修改現有頁面，可單獨上傳 `ipad-main/index.html` 覆蓋原同名檔案。
+2. 等候 GitHub Pages 部署完成並強制重新整理頁面（必要時清除 Safari 網站快取；不要清除 localStorage，否則使用者提醒／設定會消失）。
+3. 以「相對濕度」為標準，逐一確認 16 張有標題 Widget：相同字體、12px（中）、字重 760、相同透明度和左上角位置；即時天氣藍底維持白字。
+4. 820×1180 直向時核對即時天氣標題與右上角地區設定箭頭不重疊；小屏幕查看右側分頁圓點及上下手勢動畫。
+5. 確認 12 張來源 footer 的 `來源 · HH:mm` 格式、KMB 無舊右上時間；核對提醒、倒數、月曆及個人化字體設定。留意預覽圖片為模擬 API 資料，非實際報告。
+6. 實機驗收外部 API 與 Safari；程式測試只是 Chromium + mock 環境。
 
-版本 v5.20 僅調整動畫與視覺回饋，不需要清除 localStorage 或修改資料來源。
+以下為上一版完整安裝說明（歷史保留）。
+---
+MY DAY v5.23 — 安裝及驗收（繁體中文）
+
+安裝：
+1. 備份現有 GitHub Pages Repo 根目錄 index.html，記為 index_v5_22_backup.html。
+2. 解壓 MyDay_v5_23_UniformSourceFooters.zip；將 ipad-main/ 裏面的 index.html 覆蓋 Repo 根目錄同名檔案，不要把 ipad-main 多加一層。
+3. 若只是介面更新，只替換 index.html 即可，其餘原有 .github/workflows、scripts、data 可以不變。
+4. Commit + Push，等待 GitHub Pages 原有流程部署後刷新 Safari／Edge，頁腳應顯示 MY DAY v5.23。
+5. 不要刪除 Safari website data 或 localStorage，以免丟失個人提醒、重要日子、網站捷徑及偏好。
+
+重點驗收：
+- 11 個指定 Widget 左下角標籤與「即時天氣」樣式一致，例如 HKO · 10:02、Open-Meteo · 10:30、TradingView · 10:30、KMB · 10:35。
+- 九巴 Widget 右上角只保留刷新按鈕；不再有「最後更新 10:35」。
+- 檢查來源文字與卡片左下角距離相同，字體都是 9px（與即時天氣一致）；所有頁面沒有遮字、裁切。
+- 當資料無法取得時顯示 `來源 · --:--`，不能使用模擬數據或當前時間冒充官方資料。
+- Open-Meteo 表示模型時段；潮汐／日照／警告是成功讀取時間；TradingView 是嵌入載入時間，不表示交易所報價已更新。
+- iPad 上下掃與右側分頁點仍正常；計時器、24h/12h、提醒及捷徑操作仍可使用。
+
+測試：在已安裝 Playwright 和 Chromium 的開發機執行 `python tests/acceptance_v5_23.py`。
+本次自動 mock API 驗收 55/55 PASS，不代表 Safari 實機或所有官方 API 已連線驗收。
+回滾：將備份 index.html 恢復，Commit + Push，不需刪除個人資料。

@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-title" content="My Day HK">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#ecf3fc">
-<title>My Day v5.20 · iPad / Windows Dashboard</title>
+<title>My Day v5.24 · iPad / Windows Dashboard</title>
 <style>
 :root{color-scheme:light;--ink:#17243b;--ink2:#485774;--muted:#7c8aa4;--line:rgba(255,255,255,.76);--glass:rgba(255,255,255,.64);--glass2:rgba(255,255,255,.38);--shadow:0 12px 32px rgba(75,95,145,.09),inset 0 1px 0 rgba(255,255,255,.7);--blue:#377cf3;--purple:#8066db;--pink:#f17a9c;--green:#29aa89;--radius:23px;--gap:12px;--speed:.38s}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang HK","Noto Sans TC",sans-serif;letter-spacing:-.015em}body{overflow:hidden;color:var(--ink);background:linear-gradient(128deg,#ecf4ff 0%,#f3edfd 44%,#fff7ed 100%);-webkit-font-smoothing:antialiased}
@@ -1711,6 +1711,277 @@ body[data-theme="dark"] .dashboard .icon-warning{color:#e0d3ff;background:rgba(1
   .dashboard>.clock-widget.clock-format-changing .ios-clock-dial{animation:none!important}
 }
 
+
+/* v5.21 — fit complete widget pages to the viewport; no invisible overflow. */
+html,body{height:100%!important;min-height:0!important;overflow:hidden!important;overscroll-behavior:none;}
+body>.app,.app{height:100dvh!important;min-height:0!important;max-height:100dvh!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:calc(env(safe-area-inset-top) + 7px) max(9px,env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 5px) max(9px,env(safe-area-inset-left))!important;gap:7px!important;}
+.app>header{flex:0 0 39px!important;min-height:39px!important;}
+.app>footer.foot{flex:0 0 20px!important;min-height:20px!important;max-height:20px!important;overflow:hidden;font-size:9px;}
+.dashboard-viewport{position:relative;flex:1 1 auto;min-height:0;min-width:0;overflow:hidden;isolation:isolate;touch-action:auto;}
+.dashboard-track{position:absolute;inset:0;display:flex;flex-direction:column;transform:translate3d(0,0,0);transition:transform 630ms cubic-bezier(.23,.85,.25,1);will-change:transform;}
+.dashboard.page-grid{--page-tile:180px;--page-cols:4;--page-rows:3;--page-gap:8px;display:grid!important;flex:0 0 100%!important;position:relative;width:100%!important;height:100%!important;max-height:100%!important;min-height:0!important;overflow:hidden!important;margin:0!important;padding:2px!important;box-sizing:border-box;grid-template-columns:repeat(var(--page-cols),var(--page-tile))!important;grid-template-rows:repeat(var(--page-rows),var(--page-tile))!important;grid-auto-rows:var(--page-tile)!important;gap:var(--page-gap)!important;justify-content:center!important;align-content:center!important;align-items:stretch!important;}
+.dashboard.page-grid>.card{grid-area:auto!important;grid-row:auto!important;grid-column:auto!important;order:0!important;display:flex;min-width:0!important;width:100%!important;height:var(--page-tile)!important;min-height:0!important;max-height:var(--page-tile)!important;max-width:none!important;margin:0!important;aspect-ratio:auto!important;align-self:stretch!important;justify-self:stretch!important;animation-duration:.4s;}
+.dashboard.page-grid>.card[data-page-span="2"]{grid-column:span 2!important;}
+/* Keep each existing square widget exactly 1:1; the forecast/news are intentionally wide. */
+.dashboard.page-grid>.card:not([data-page-span="2"]){aspect-ratio:1 / 1!important;}
+.dashboard.page-grid>.card.news,.dashboard.page-grid>.card.forecast{display:flex;flex-direction:column;min-height:0!important;}
+.dashboard.page-grid>.card.news .headlines{flex:1;min-height:0;overflow:auto;scrollbar-width:none;}
+.dashboard.page-grid>.card.news .headlines::-webkit-scrollbar{display:none;}
+.dashboard.page-grid>.card.forecast .forecast-rail{flex:1;height:auto!important;min-height:0;}
+.dashboard.page-grid>.card.alerts{display:flex!important;}
+/* Data metrics: consistent iOS cards, large responsive value + source disclaimer. */
+.dashboard.page-grid>.card.meteo-card{container-type:inline-size;display:flex!important;flex-direction:column!important;justify-content:space-between!important;align-items:stretch!important;gap:3px;padding:clamp(10px,6cqw,17px)!important;}
+.meteo-pressure{background:linear-gradient(148deg,rgba(238,248,255,.98),rgba(218,236,253,.90));color:#32637f;}
+.meteo-visibility{background:linear-gradient(148deg,rgba(235,250,247,.98),rgba(209,242,233,.91));color:#246e64;}
+.meteo-uv{background:linear-gradient(145deg,rgba(255,247,222,.98),rgba(255,232,191,.92));color:#936129;}
+.meteo-wind{background:linear-gradient(150deg,rgba(242,238,255,.98),rgba(220,229,255,.94));color:#6660a0;}
+.meteo-title{display:flex;align-items:center;gap:6px;font-size:clamp(11px,6.8cqw,15px);font-weight:790;white-space:nowrap;}
+.meteo-icon{flex:0 0 clamp(22px,14cqw,29px);width:clamp(22px,14cqw,29px);height:clamp(22px,14cqw,29px);padding:5px;border-radius:9px;background:rgba(255,255,255,.55);display:grid;place-items:center;}
+.meteo-icon svg{width:100%;height:100%;display:block;}
+.meteo-mid{display:flex;flex:1;min-height:0;flex-direction:column;justify-content:center;}
+.meteo-measure{display:flex;align-items:baseline;gap:4px;min-width:0;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.meteo-measure strong{font-size:clamp(36px,26cqw,67px);line-height:1;letter-spacing:-.075em;font-weight:750;min-width:0;}
+.meteo-measure>span{font-size:clamp(10px,7.7cqw,15px);font-weight:690;flex:0 0 auto;}
+.meteo-mid p,.meteo-wind-line{font-size:clamp(10px,6.4cqw,13px);line-height:1.35;font-weight:680;margin:8px 0 0;}
+.meteo-wind-line{display:flex;align-items:center;gap:7px;}
+.meteo-compass{display:inline-grid;place-items:center;width:23px;height:23px;border-radius:50%;font-weight:850;background:rgba(255,255,255,.66);transform:rotate(0deg);transition:transform .7s ease;}
+.meteo-bottom{font-size:clamp(8px,5.9cqw,11px);font-weight:610;line-height:1.3;opacity:.75;min-height:1.3em;}
+body[data-theme="dark"] .meteo-card{filter:brightness(.86);color:#25364e;}
+/* Accessible, minimal page control: dots, arrows, and explicit page count. */
+.page-navigation{position:absolute;right:6px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;align-items:center;gap:5px;padding:7px 4px;border-radius:18px;background:rgba(245,247,255,.79);border:1px solid rgba(255,255,255,.78);box-shadow:0 5px 22px rgba(49,69,116,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.page-navigation[hidden]{display:none!important;}
+.page-nav-button{width:27px;height:27px;border:0;background:transparent;color:#677baa;border-radius:10px;font-weight:800;font-size:16px;display:grid;place-items:center;cursor:pointer;}
+.page-nav-button:disabled{opacity:.24;cursor:default;}
+.page-nav-dots{display:flex;flex-direction:column;gap:7px;align-items:center;}
+.page-nav-dot{width:8px;height:8px;border:0;border-radius:50%;background:#a6b2cb;padding:0;cursor:pointer;transition:transform .3s,background .3s;}
+.page-nav-dot[aria-current="page"]{background:#527ff2;transform:scale(1.35);}
+.page-counter{font-size:8px;font-weight:760;color:#6e809d;white-space:nowrap;font-variant-numeric:tabular-nums;}
+@media(max-width:680px){.page-navigation{right:3px;padding:6px 3px}.page-nav-button{width:23px;height:24px}}
+@media(prefers-reduced-motion:reduce){.dashboard-track{transition:none!important}.page-nav-dot,.meteo-compass{transition:none!important}}
+body[data-motion="reduce"] .dashboard-track{transition:none!important;}
+@media(max-width:500px){.app>header .header-mid{font-size:9px}.app>footer.foot .foot-right{display:none}.brand{font-size:14px}.brand-logo{width:29px;height:29px}}
+
+
+/* v5.21 navigation is in the header, never on top of a widget. */
+.page-navigation{position:static!important;top:auto!important;right:auto!important;left:auto!important;bottom:auto!important;transform:none!important;flex:0 0 auto;flex-direction:row!important;gap:3px!important;padding:2px 5px!important;border-radius:12px;box-shadow:none;background:rgba(246,248,255,.72);}
+.page-nav-button{width:24px!important;height:27px!important;font-size:17px;}
+.page-nav-dots{flex-direction:row!important;gap:5px!important;margin:0 3px;}
+.page-counter{font-size:9px;min-width:25px;text-align:center;}
+@media(max-width:700px){body.has-dashboard-pages .app>header .header-mid{display:none!important;}body.has-dashboard-pages .app>header .brand{font-size:13px;gap:6px}}
+
+
+@media(max-width:365px){
+ body.has-dashboard-pages .app>header .brand{font-size:12px;gap:4px}
+ .app>header .brand-logo{width:25px;height:25px;font-size:15px;border-radius:9px}
+ .app>header .page-nav-dots{display:none!important}
+ .app>header .page-nav-button{width:20px!important;height:25px!important;font-size:14px}
+ .app>header .page-navigation{gap:0!important;padding:1px 3px!important}
+ .app>header .page-counter{font-size:8px;min-width:22px}
+ .app>header .head-actions{gap:3px}
+ .app>header .icon-btn{width:30px;height:30px;border-radius:10px}
+}
+
+
+/* v5.22 — reference-inspired miniature weather instruments.
+   Drawn using SVG/CSS at the *actual* card dimensions; readings come from API only. */
+.dashboard.page-grid>.card.meteo-instrument{padding:clamp(8px,5cqw,13px)!important;gap:2px!important;overflow:hidden!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.65),0 7px 20px rgba(38,66,113,.055)}
+.dashboard.page-grid>.card.meteo-instrument .meteo-title{gap:5px;flex:0 0 auto;font-size:clamp(10px,7.4cqw,14px);letter-spacing:-.02em;color:inherit;opacity:.93}
+.dashboard.page-grid>.card.meteo-instrument .meteo-icon{background:rgba(255,255,255,.33);border-radius:8px;width:clamp(18px,12cqw,24px);height:clamp(18px,12cqw,24px);flex-basis:clamp(18px,12cqw,24px);padding:3px;}
+.dashboard.page-grid>.card.meteo-instrument .meteo-bottom{flex:0 0 auto;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;min-height:1em;font-size:clamp(7px,5cqw,9px);line-height:1.15;opacity:.7}
+.dashboard.page-grid>.card.meteo-pressure{background:linear-gradient(148deg,#e9f4fc 3%,#c9dff2 97%)!important;color:#285f88!important;}
+.dashboard.page-grid>.card.meteo-wind{background:linear-gradient(155deg,#e9efff 2%,#d0ddfa 100%)!important;color:#365789!important;}
+.dashboard.page-grid>.card.meteo-uv{background:linear-gradient(150deg,#fff6e5 0%,#ffebbf 100%)!important;color:#8d621c!important;}
+.pressure-dial{position:relative;min-height:0;flex:1;display:flex;justify-content:center;align-items:center;width:100%;}
+.pressure-dial>svg{position:absolute;inset:0;width:100%;height:100%;stroke:currentColor;overflow:visible;}
+.pressure-tick{stroke-width:2.8;stroke:rgba(74,117,156,.25);stroke-linecap:round;transition:stroke .35s}
+.pressure-tick.is-lit{stroke:rgba(59,135,197,.64)}
+#pressureNeedle{stroke:#fff;filter:drop-shadow(0 1px 2px rgba(28,70,124,.33));transition:transform 650ms cubic-bezier(.2,.8,.3,1),opacity .25s}
+.pressure-readout{position:absolute;top:57%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center;}
+.pressure-trend{font-weight:800;font-size:clamp(14px,12cqw,24px);line-height:.8;min-height:1em;color:#3981bd}
+.pressure-trend[data-trend="down"]{color:#e48078}
+.pressure-readout strong{font-size:clamp(26px,23.5cqw,47px);line-height:1.02;font-weight:790;letter-spacing:-.072em;color:#285b80}
+.pressure-unit{font-size:clamp(11px,9cqw,16px);font-weight:660;line-height:1.15;opacity:.85}
+.pressure-extremes{position:absolute;bottom:0;left:16%;right:16%;display:flex;justify-content:space-between;align-items:end;font-size:clamp(10px,8cqw,14px);font-weight:720;opacity:.74}
+.wind-rose{position:relative;width:100%;flex:1 1 0;min-height:0;display:grid;place-items:center;}
+.wind-rose svg{position:absolute;inset:0;height:100%;width:100%;overflow:visible;}
+.wind-tick{stroke:rgba(59,96,152,.26);stroke-width:1.6;stroke-linecap:round}
+.wind-tick.is-major{stroke:rgba(42,79,143,.47);stroke-width:2}
+.wind-compass-label{font-size:14px;font-weight:760;fill:currentColor;opacity:.9}
+.wind-bearing-line,.wind-bearing-head{fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 1px rgba(23,60,118,.14));}
+.wind-bearing-origin{fill:#fff;filter:drop-shadow(0 1px 2px rgba(31,71,129,.28));}
+#windArrow{transition:transform 650ms cubic-bezier(.2,.7,.25,1),opacity .25s}
+.wind-core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:39%;max-width:65px;aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0;background:rgba(208,225,252,.83);box-shadow:0 1px 12px rgba(66,108,170,.13);font-variant-numeric:tabular-nums;}
+.wind-core strong{font-size:clamp(23px,20cqw,40px);line-height:1;font-weight:780;letter-spacing:-.065em;color:#315280}
+.wind-core span{font-size:clamp(9px,7.7cqw,14px);font-weight:700;line-height:1.2;}
+.wind-details{display:flex;gap:4px;align-items:center;justify-content:space-between;flex:0 0 auto;min-height:1.15em;white-space:nowrap;font-size:clamp(8px,6cqw,10px);font-weight:740;letter-spacing:-.04em;}
+.wind-details #windGust{font-weight:620;opacity:.8}
+.uv-reading{display:flex;flex-direction:column;justify-content:center;flex:1 1 auto;min-height:0;gap:2px;font-variant-numeric:tabular-nums;}
+.uv-reading strong{font-size:clamp(42px,37cqw,66px);line-height:1;font-weight:700;letter-spacing:-.085em;color:#a76d17}
+.uv-level{font-size:clamp(12px,9.6cqw,17px);line-height:1.1;font-weight:770;white-space:nowrap;letter-spacing:-.045em;}
+.uv-meter{height:clamp(7px,4.2cqw,10px);flex:0 0 auto;position:relative;border-radius:50px;background:linear-gradient(90deg,#2bc870 0%,#d9d928 20%,#ffab29 42%,#fb692b 58%,#ef417b 76%,#bd42e1 100%);margin:4px 1px 0;box-shadow:0 1px 2px rgba(125,93,28,.10);}
+.uv-meter-pointer{position:absolute;top:50%;width:clamp(10px,7.4cqw,14px);height:clamp(10px,7.4cqw,14px);border:2px solid white;border-radius:50%;background:#715142;box-shadow:0 0 0 1px rgba(63,70,77,.3),0 1px 4px rgba(80,48,24,.2);transform:translate(-50%,-50%);transition:left 600ms cubic-bezier(.2,.8,.25,1)}
+.uv-meter-pointer[hidden]{display:none!important}
+.uv-advice{flex:0 0 auto;font-size:clamp(9px,6.7cqw,12px);font-weight:680;line-height:1.22;min-height:1.1em;letter-spacing:-.025em;margin-top:3px;}
+.meteo-uv[data-uv-level="high"] .uv-reading strong,.meteo-uv[data-uv-level="very-high"] .uv-reading strong{color:#c96721}
+.meteo-uv[data-uv-level="extreme"] .uv-reading strong{color:#b74875}
+.meteo-uv[data-uv-level="low"] .uv-reading strong{color:#2a9668}
+/* Right-edge dot pagination: only on multi-page dashboards, never in the header. */
+.page-navigation{position:absolute!important;right:0!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:0!important;width:22px!important;max-height:85%!important;padding:8px 1px!important;margin:0!important;border:0!important;border-radius:15px!important;background:rgba(246,248,255,.42)!important;box-shadow:none!important;z-index:8;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.page-navigation[hidden]{display:none!important}
+.page-nav-dots{display:flex!important;flex-direction:column!important;align-items:center!important;gap:3px!important;margin:0!important;overflow-y:auto;max-height:70dvh;scrollbar-width:none;}
+.page-nav-dots::-webkit-scrollbar{display:none}
+.page-nav-dot{display:block!important;position:relative;flex:0 0 20px!important;width:20px!important;height:20px!important;min-height:20px;padding:0!important;border:0!important;border-radius:50%;background:transparent!important;transform:none!important;cursor:pointer;}
+.page-nav-dot::after{content:"";position:absolute;top:50%;left:50%;height:7px;width:7px;border-radius:50%;background:#9cacbf;box-shadow:0 0 0 1px rgba(255,255,255,.6);transform:translate(-50%,-50%);transition:background .3s,transform .3s,box-shadow .3s;}
+.page-nav-dot[aria-current="page"]::after{background:#597de4;transform:translate(-50%,-50%) scale(1.3);box-shadow:0 0 0 3px rgba(92,124,226,.16);}
+.page-nav-dot:focus-visible{outline:2px solid #5278cf;outline-offset:0;border-radius:50%}
+.page-nav-button{display:none!important}
+.page-counter{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;}
+body.has-dashboard-pages .dashboard.page-grid{padding-left:2px!important;padding-right:27px!important;}
+@media(max-width:365px){body.has-dashboard-pages .dashboard.page-grid{padding-right:20px!important}.page-navigation{width:18px!important}.page-nav-dot{width:18px!important}}
+@media(prefers-reduced-motion:reduce){.pressure-tick,#pressureNeedle,#windArrow,.uv-meter-pointer,.page-nav-dot::after{transition:none!important}}
+body[data-motion="reduce"] #pressureNeedle,body[data-motion="reduce"] #windArrow{transition:none!important}
+body[data-theme="dark"] .dashboard.page-grid>.card.meteo-pressure{background:linear-gradient(150deg,#26435e,#233754)!important;color:#b8dcff!important;filter:none!important}
+body[data-theme="dark"] .dashboard.page-grid>.card.meteo-wind{background:linear-gradient(150deg,#263959,#303d65)!important;color:#d4e4ff!important;filter:none!important}
+body[data-theme="dark"] .dashboard.page-grid>.card.meteo-uv{background:linear-gradient(150deg,#51442e,#5a4431)!important;color:#ffe3a5!important;filter:none!important}
+body[data-theme="dark"] .pressure-readout strong,body[data-theme="dark"] .wind-core strong{color:#e1edff!important}
+body[data-theme="dark"] .wind-core{background:rgba(42,66,112,.88)}
+body[data-theme="dark"] .page-navigation{background:rgba(42,50,70,.46)!important}
+body[data-theme="dark"] .page-nav-dot::after{background:#8c9ec2}
+body[data-theme="dark"] .page-nav-dot[aria-current="page"]::after{background:#adc5ff}
+
+/* v5.23 — shared bottom-left source/update stamp for all requested widgets.
+   Purely typographic: original card colors and light/dark palettes remain intact. */
+.dashboard.page-grid>.card .widget-source{
+ display:block!important;box-sizing:border-box;flex:0 0 auto!important;
+ align-self:stretch!important;width:100%;max-width:100%;min-width:0;
+ margin:3px 0 0!important;padding:0!important;
+ font-family:inherit!important;font-size:calc(9px * var(--font-scale))!important;
+ line-height:1.2!important;font-weight:650!important;letter-spacing:0!important;
+ font-variant-numeric:tabular-nums;white-space:nowrap!important;
+ text-align:left!important;overflow:hidden!important;text-overflow:ellipsis!important;
+ color:var(--ink2);opacity:.75!important;
+ position:relative;z-index:2;
+}
+.dashboard.page-grid>.card.ios-weather .widget-source{
+ color:rgba(245,251,255,.82)!important;opacity:1!important;
+}
+.dashboard.page-grid>.card.humidity-widget .humidity-bottom{margin-top:auto!important;flex:0 0 auto!important;}
+.dashboard.page-grid>.card.meteo-card .widget-source{margin-top:auto!important;}
+.dashboard.page-grid>.card.meteo-instrument .widget-source{font-size:calc(9px * var(--font-scale))!important;line-height:1.2!important;min-height:1.2em!important;opacity:.75!important;}
+.dashboard.page-grid>.card.alerts{
+ flex-direction:column!important;align-items:stretch!important;justify-content:space-between!important;
+ gap:2px!important;overflow:hidden!important;
+}
+.dashboard.page-grid>.card.alerts .alert-kicker{flex:0 0 auto!important;margin:0!important;}
+.dashboard.page-grid>.card.alerts .alert-body{flex:1 1 auto!important;min-height:0!important;
+ display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+.dashboard.page-grid>.card.alerts .widget-chevron{position:absolute;right:10px;top:10px;}
+.dashboard.page-grid>.card.alerts .widget-source{margin-top:auto!important;}
+.dashboard.page-grid>.card.sun-widget .sun-arc{min-height:0!important;}
+.dashboard.page-grid>.card.sun-widget .sun-times{flex:0 0 auto!important;}
+.dashboard.page-grid>.card.sun-widget .widget-source{margin-top:auto!important;}
+.dashboard.page-grid>.card.tide-widget .tide-art{flex-shrink:1!important;min-height:12px;}
+.dashboard.page-grid>.card.tide-widget .widget-source{margin-top:auto!important;}
+.dashboard.page-grid>.card.forecast .forecast-rail{flex:1 1 auto!important;min-height:0!important;overflow:hidden;}
+.dashboard.page-grid>.card.forecast .widget-source{margin-top:4px!important;}
+.dashboard.page-grid>.card.hsi-v56 .hsi-foot{margin-top:auto!important;flex:0 0 auto!important;min-height:1.2em!important;}
+.dashboard.page-grid>.card.hsi-v56 .hsi-foot .widget-source{margin:0!important;}
+.dashboard.page-grid>.card.kmb-v57 .bus-update-controls{margin-left:auto;}
+.dashboard.page-grid>.card.kmb-v57 .bus-source{margin-top:auto!important;}
+.dashboard.page-grid>.card.kmb-v57 .etas{flex:1 1 auto!important;min-height:0;}
+/* A readable but subtle label in dark mode; preserve card-specific palette. */
+body[data-theme="dark"] .dashboard.page-grid>.card .widget-source{color:var(--ink2);opacity:.85!important;}
+body[data-theme="dark"] .dashboard.page-grid>.card.ios-weather .widget-source{color:rgba(255,255,255,.86)!important;opacity:1!important;}
+body[data-theme="dark"] .dashboard.page-grid>.card.meteo-pressure .widget-source,
+body[data-theme="dark"] .dashboard.page-grid>.card.meteo-wind .widget-source,
+body[data-theme="dark"] .dashboard.page-grid>.card.meteo-uv .widget-source{color:inherit!important;opacity:.83!important;}
+/* Same exact inset and optical baseline on every widget; reserve room for text. */
+.dashboard.page-grid>.card:has(> .widget-source),
+.dashboard.page-grid>.card:has(.humidity-bottom > .widget-source),
+.dashboard.page-grid>.card:has(.ios-weather-bottom > .widget-source),
+.dashboard.page-grid>.card:has(.hsi-foot .widget-source){
+ position:relative!important;padding-bottom:23px!important;
+}
+.dashboard.page-grid>.card.hsi-v56 .hsi-foot{position:static!important;}
+.dashboard.page-grid>.card .widget-source,
+.dashboard.page-grid>.card.humidity-widget #humidityHint.widget-source{
+ position:absolute!important;left:11px!important;right:11px!important;bottom:11px!important;
+ width:calc(100% - 22px)!important;max-width:calc(100% - 22px)!important;
+ height:11px!important;min-height:11px!important;max-height:11px!important;
+ margin:0!important;padding:0!important;font-size:9px!important;line-height:11px!important;
+}
+
+
+/* ── v5.24: shared visual title specification, based on 相對濕度 ──
+   Reference: 12px × 760, tracking -.025em, 24px icon, top/left 11px.
+   The actual heading title (not its status tag) inherits the same optical style.
+   Offsets only shift the heading row; inner card content/layout remains in flow. */
+.dashboard.page-grid > .card { --unified-title-size:calc(12px * var(--font-scale)); --unified-title-line:1.2; }
+.dashboard.page-grid > .card .widget-heading {
+ font-family:inherit!important;
+ font-size:var(--unified-title-size)!important;
+ font-weight:760!important;
+ line-height:var(--unified-title-line)!important;
+ letter-spacing:-.025em!important;
+ color:var(--ink)!important;
+ opacity:1!important;
+ text-transform:none!important;
+ text-shadow:none!important;
+}
+/* White on blue weather tile is essential for contrast; transparency is still 100%. */
+.dashboard.page-grid > .card.ios-weather .widget-heading {color:#fff!important;}
+/* Uniform 24px icon at the beginning of every titled widget. */
+.dashboard.page-grid > .card .section-title.widget-heading {gap:6px!important;white-space:nowrap;min-width:0;}
+.dashboard.page-grid > .card .section-title.widget-heading > .ic {
+ display:inline-grid!important;place-items:center!important;
+ flex:0 0 24px!important;width:24px!important;height:24px!important;
+ padding:0!important;font-size:14px!important;line-height:1!important;
+ border-radius:8px!important;
+}
+.dashboard.page-grid > .card .meteo-title.widget-heading{height:24px;min-height:24px;gap:6px!important;flex:0 0 24px!important;}
+.dashboard.page-grid > .card .meteo-title.widget-heading .meteo-icon {
+ width:24px!important;height:24px!important;flex:0 0 24px!important;
+ padding:4px!important;border-radius:8px!important;
+}
+.dashboard.page-grid > .card .widget-mini-icon {
+ width:24px!important;height:24px!important;flex:0 0 24px!important;
+ padding:4px!important;border-radius:8px!important;
+}
+/* All header text starts after the same 24px icon + 6px gap. */
+.dashboard.page-grid > .card.ios-weather .ios-weather-top,
+.dashboard.page-grid > .card.alerts .alert-kicker,
+.dashboard.page-grid > .card.kmb-v57 .bus-brand,
+.dashboard.page-grid > .card.hsi-v56 .hsi-identity {gap:6px!important;}
+.dashboard.page-grid > .card.ios-weather .ios-weather-top,
+.dashboard.page-grid > .card.kmb-v57 .bus-topline,
+.dashboard.page-grid > .card.hsi-v56 .hsi-topline,
+.dashboard.page-grid > .card.alerts .alert-kicker,
+.dashboard.page-grid > .card.calendar-widget .calendar-top {min-height:24px!important;}
+.dashboard.page-grid > .card.kmb-v57 .bus-brand.widget-heading {display:inline-flex;align-items:center;white-space:nowrap;}
+.dashboard.page-grid > .card.kmb-v57 .bus-brand.widget-heading > span:last-child{font:inherit!important;letter-spacing:inherit!important;}
+.dashboard.page-grid > .card.hsi-v56 .hsi-name .widget-heading {line-height:1.2!important;white-space:nowrap;}
+.dashboard.page-grid > .card.calendar-widget .calendar-top .widget-heading {white-space:nowrap;}
+/* Match top-left position of the reference tile at every supported grid size:
+   most cards have 10px padding, meteo instruments 13px, visibility 17px,
+   alerts/tasks 14px, calendar 16px. Retain each card's body padding. */
+.dashboard.page-grid > .card.meteo-instrument .meteo-title {position:relative;left:-3px;top:-3px;}
+.dashboard.page-grid > .card.meteo-visibility .meteo-title {position:relative;left:-7px;top:-7px;}
+.dashboard.page-grid > .card.alerts .alert-kicker {position:relative;left:-4px;top:-4px;}
+.dashboard.page-grid > .card.tasks .section-head,
+.dashboard.page-grid > .card.days-matter .section-head {position:relative;left:-4px;top:-4px;}
+.dashboard.page-grid > .card.news .section-head {position:relative;top:0;}
+.dashboard.page-grid > .card.calendar-widget .calendar-top{position:relative;left:-6px;top:-6px;align-items:center!important;height:24px;}
+@media (orientation:portrait) and (min-width:601px) and (max-width:960px){ .dashboard.page-grid > .card.ios-weather .ios-weather-top {position:relative;left:1px;top:1px;} .dashboard.page-grid > .card.ios-weather .ios-weather-top {justify-content:flex-start!important;padding-right:34px!important;} .dashboard.page-grid > .card.ios-weather .ios-weather-top .eyebrow {flex:1 1 auto!important;max-width:none!important;} }
+/* News heading is vertically centered in its row by legacy CSS; keep baseline consistent. */
+.dashboard.page-grid > .card.news .section-head{margin-top:0!important;}
+/* Keep metadata badges/chips distinct from the headline text, as in 相對濕度. */
+.dashboard.page-grid > .card .widget-heading .tag {font-size:clamp(7px,5cqw,9px)!important;font-weight:650!important;letter-spacing:0!important;}
+.dashboard.page-grid > .card.news .section-title.widget-heading {font-size:var(--unified-title-size)!important;}
+@media (max-width:365px){
+ .dashboard.page-grid > .card {--unified-title-size:calc(12px * var(--font-scale));}
+ .dashboard.page-grid > .card .widget-heading .tag {display:none;}
+}
+
 </style>
 </head>
 <body data-theme="light">
@@ -1724,30 +1995,35 @@ body[data-theme="dark"] .dashboard .icon-warning{color:#e0d3ff;background:rgba(1
 <main class="dashboard">
  <section class="card date-widget" aria-label="香港日期"><div class="ios-date-top"><span class="date-week" id="dateWeek"><span id="dateWeekday">Wed</span> <span id="dateMonth">Nov</span></span></div><div class="date-main"><span class="date-day" id="dateDay">4</span></div><span id="date" class="sr-only">香港日期載入中</span></section>
  <section class="card hero clock-widget" id="clockWidget" role="button" tabindex="0" aria-pressed="false" aria-label="香港時間，24小時制，按下切換12小時制"><svg id="secondRing" class="clock-second-ring" viewBox="0 0 180 180" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path id="secondRingGuide" d="M90 10 H142 A28 28 0 0 1 170 38 V142 A28 28 0 0 1 142 170 H38 A28 28 0 0 1 10 142 V38 A28 28 0 0 1 38 10 H90 Z" fill="none" stroke="none"/></svg><div class="ios-clock-dial"><div class="clock"><span id="clock">--:--</span></div><span class="clock-meridiem" id="clockMeridiem" hidden>AM</span></div><span id="seconds" class="sr-only">--</span></section>
- <section class="card weather ios-weather" aria-label="香港即時天氣"><div class="ios-weather-top"><span class="widget-mini-icon icon-weather" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="7.7" cy="7" r="2.4"/><path d="M7.7 1.5v1.2M7.7 11.2v1.2M2.2 7h1.2M12 3l-.9.9M4 3l.9.9"/><path d="M7.1 19.1H19a3.3 3.3 0 0 0 0-6.6 5.5 5.5 0 0 0-10.6-1.4A4.1 4.1 0 0 0 7.1 19.1Z"/></svg></span><span class="eyebrow" id="weatherPlace">大埔 · 即時天氣</span><button class="widget-corner-link weather-location-edit" id="weatherLocationEdit" type="button" aria-label="選擇天文台即時天氣測站" title="個人化天氣地區">↗</button></div><div class="ios-weather-main"><div class="big-temp"><span id="temperature">--</span><span class="degree">°</span></div><span class="weather-icon" id="weatherIcon" aria-hidden="true">☁️</span></div><div class="ios-weather-bottom"><strong id="weatherCondition">天氣資料載入中</strong><div class="small-label" id="weatherDesc">香港天文台分區氣溫</div><div class="weather-source" id="weatherUpdated">HKO · --:--</div></div></section>
- <section class="card humidity-widget" aria-label="香港相對濕度"><div class="section-head"><div class="section-title"><span class="ic humidity-ic">💧</span> 相對濕度</div><span class="tag" id="humidityStation" hidden aria-hidden="true">HKO</span></div><div class="humidity-body"><div class="humidity-number"><span id="humidity">--</span><small>%</small></div><div class="humidity-art" aria-hidden="true"><svg viewBox="0 0 84 100" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="dropBlue" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#a8e2ff"/><stop offset=".52" stop-color="#60adf3"/><stop offset="1" stop-color="#6d78e8"/></linearGradient><clipPath id="dropClip"><path d="M42 4 C35 19 12 44 12 63 C12 83 25 96 42 96 C59 96 72 83 72 63 C72 44 49 19 42 4Z"/></clipPath></defs><path d="M42 4 C35 19 12 44 12 63 C12 83 25 96 42 96 C59 96 72 83 72 63 C72 44 49 19 42 4Z" fill="url(#dropBlue)" opacity=".29"/><g clip-path="url(#dropClip)"><rect id="humidityFill" x="0" y="100" width="84" height="0" fill="url(#dropBlue)" opacity=".8" style="transition:y 1.4s cubic-bezier(.2,1,.2,1),height 1.4s cubic-bezier(.2,1,.2,1)"/><path d="M0 60 Q17 51 34 61 T68 61 T102 61" fill="none" stroke="white" stroke-opacity=".55" stroke-width="3"/></g><path d="M29 56 C24 68 28 78 35 82" stroke="white" stroke-opacity=".7" stroke-width="4" stroke-linecap="round" fill="none"/></svg></div></div><div class="humidity-bottom"><span id="humidityHint">HKO · --:--</span></div></section>
+ <section class="card weather ios-weather" aria-label="香港即時天氣"><div class="ios-weather-top"><span class="widget-mini-icon icon-weather" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="7.7" cy="7" r="2.4"/><path d="M7.7 1.5v1.2M7.7 11.2v1.2M2.2 7h1.2M12 3l-.9.9M4 3l.9.9"/><path d="M7.1 19.1H19a3.3 3.3 0 0 0 0-6.6 5.5 5.5 0 0 0-10.6-1.4A4.1 4.1 0 0 0 7.1 19.1Z"/></svg></span><span class="eyebrow widget-heading" id="weatherPlace">大埔 · 即時天氣</span><button class="widget-corner-link weather-location-edit" id="weatherLocationEdit" type="button" aria-label="選擇天文台即時天氣測站" title="個人化天氣地區">↗</button></div><div class="ios-weather-main"><div class="big-temp"><span id="temperature">--</span><span class="degree">°</span></div><span class="weather-icon" id="weatherIcon" aria-hidden="true">☁️</span></div><div class="ios-weather-bottom"><strong id="weatherCondition">天氣資料載入中</strong><div class="small-label" id="weatherDesc">香港天文台分區氣溫</div><div class="weather-source widget-source" id="weatherUpdated">HKO · --:--</div></div></section>
+ <section class="card humidity-widget" aria-label="香港相對濕度"><div class="section-head"><div class="section-title widget-heading"><span class="ic humidity-ic">💧</span> 相對濕度</div><span class="tag" id="humidityStation" hidden aria-hidden="true">HKO</span></div><div class="humidity-body"><div class="humidity-number"><span id="humidity">--</span><small>%</small></div><div class="humidity-art" aria-hidden="true"><svg viewBox="0 0 84 100" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="dropBlue" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#a8e2ff"/><stop offset=".52" stop-color="#60adf3"/><stop offset="1" stop-color="#6d78e8"/></linearGradient><clipPath id="dropClip"><path d="M42 4 C35 19 12 44 12 63 C12 83 25 96 42 96 C59 96 72 83 72 63 C72 44 49 19 42 4Z"/></clipPath></defs><path d="M42 4 C35 19 12 44 12 63 C12 83 25 96 42 96 C59 96 72 83 72 63 C72 44 49 19 42 4Z" fill="url(#dropBlue)" opacity=".29"/><g clip-path="url(#dropClip)"><rect id="humidityFill" x="0" y="100" width="84" height="0" fill="url(#dropBlue)" opacity=".8" style="transition:y 1.4s cubic-bezier(.2,1,.2,1),height 1.4s cubic-bezier(.2,1,.2,1)"/><path d="M0 60 Q17 51 34 61 T68 61 T102 61" fill="none" stroke="white" stroke-opacity=".55" stroke-width="3"/></g><path d="M29 56 C24 68 28 78 35 82" stroke="white" stroke-opacity=".7" stroke-width="4" stroke-linecap="round" fill="none"/></svg></div></div><div class="humidity-bottom"><span class="widget-source" id="humidityHint">HKO · --:--</span></div></section>
+ <!-- v5.21: additional meteorological metrics. Never display fabricated live values. -->
+ <section class="card meteo-card meteo-pressure meteo-instrument" data-meteo="pressure" aria-label="海平面氣壓，天氣模型估算"><div class="meteo-title widget-heading"><span class="meteo-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M6.5 15.5a6 6 0 0 1 11 0M12 13l3.5-4M9 3h6"/><circle cx="12" cy="13" r="1.2" fill="currentColor" stroke="none"/></svg></span><span>氣壓</span></div><div class="pressure-dial"><svg viewBox="0 0 180 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g id="pressureTicks"></g><line id="pressureNeedle" style="opacity:0" x1="90" y1="22" x2="90" y2="39" stroke-linecap="round" stroke-width="5" /></svg><div class="pressure-readout"><span class="pressure-trend" id="pressureTrend" title="暫無氣壓變化資料">—</span><strong id="pressureValue">--</strong><span class="pressure-unit">kPa</span></div><div class="pressure-extremes"><span>低</span><span>高</span></div></div><div class="meteo-bottom widget-source" id="pressureSource">Open-Meteo · --:--</div></section>
+ <section class="card meteo-card meteo-visibility" data-meteo="visibility" aria-label="能見度，天氣模型估算"><div class="meteo-title widget-heading"><span class="meteo-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 12s4-6.5 10-6.5S22 12 22 12s-4 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span><span>能見度</span></div><div class="meteo-mid"><div class="meteo-measure"><strong id="visibilityValue">--</strong><span>km</span></div><p id="visibilityDesc">模型預估視程</p></div><div class="meteo-bottom widget-source" id="visibilitySource">Open-Meteo · --:--</div></section>
+ <section class="card meteo-card meteo-uv meteo-instrument" data-meteo="uv" aria-label="紫外線指數"><div class="meteo-title widget-heading"><span class="meteo-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M20 4l-2 2M6 18l-2 2"/></svg></span><span>紫外線指數</span></div><div class="uv-reading"><strong id="uvValue">--</strong><span class="uv-level" id="uvDesc">正查詢指數</span></div><div class="uv-meter" role="img" aria-label="紫外線指數 0 至 14 的顏色刻度"><span class="uv-meter-pointer" id="uvPointer" hidden></span></div><div class="uv-advice" id="uvAdvice">正在查詢紫外線防護建議</div><div class="meteo-bottom widget-source" id="uvSource">HKO · --:--</div></section>
+ <section class="card meteo-card meteo-wind meteo-instrument" data-meteo="wind" aria-label="風向及風速，天氣模型估算"><div class="meteo-title widget-heading"><span class="meteo-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 7h13a3 3 0 1 0-3-3M2 12h18a2 2 0 1 1-2 2M3 17h10a3 3 0 1 1-3 3"/></svg></span><span>風向及風速</span></div><div class="wind-rose"><svg viewBox="0 0 180 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g id="windTicks"></g><g id="windArrow" style="opacity:0" transform="rotate(0 90 90)"><path d="M146 90H118 M63 90H34" class="wind-bearing-line"/><path d="M46 80 28 90 46 100" class="wind-bearing-head"/><circle cx="146" cy="90" r="7" class="wind-bearing-origin"/></g><text x="90" y="22" text-anchor="middle" class="wind-compass-label">N</text><text x="158" y="95" text-anchor="middle" class="wind-compass-label">E</text><text x="90" y="170" text-anchor="middle" class="wind-compass-label">S</text><text x="22" y="95" text-anchor="middle" class="wind-compass-label">W</text></svg><div class="wind-core"><strong id="windValue">--</strong><span>km/h</span></div></div><div class="wind-details"><span id="windDesc">模型預估風向</span><span id="windGust">陣風 --</span></div><div class="meteo-bottom widget-source" id="windSource">Open-Meteo · --:--</div></section>
  <section class="card shortcuts-widget" id="shortcutsCard" aria-label="常用網站捷徑"><button class="shortcuts-edit" id="editShortcuts" type="button" title="編輯四個網址" aria-label="編輯四個網站捷徑網址">↗</button><nav class="shortcuts-grid" id="shortcutsGrid" aria-label="四個常用網站"></nav></section>
- <section class="card alerts clickable-widget" id="alertsCard" role="button" tabindex="0" aria-label="查看香港天文台警告及提示詳情"><div class="alert-kicker"><span class="widget-mini-icon icon-warning" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 3.2 9 16a1 1 0 0 1-.9 1.5H3.9a1 1 0 0 1-.9-1.5l9-16Z"/><path d="M12 9v5"/><path d="M12 17.6h.01"/></svg></span><span>天氣警告</span></div><div class="alert-body"><div class="alert-status-row"><div class="alert-symbol" id="alertIcon">✓</div><div class="alert-title" id="alertTitle">正在檢查警告</div></div><div class="alert-desc" id="alertDesc">正在查詢現正生效的天氣警告及特別天氣提示</div></div><span class="widget-chevron" aria-hidden="true">›</span></section>
+ <section class="card alerts clickable-widget" id="alertsCard" role="button" tabindex="0" aria-label="查看香港天文台警告及提示詳情"><div class="alert-kicker widget-heading"><span class="widget-mini-icon icon-warning" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 3.2 9 16a1 1 0 0 1-.9 1.5H3.9a1 1 0 0 1-.9-1.5l9-16Z"/><path d="M12 9v5"/><path d="M12 17.6h.01"/></svg></span><span>天氣警告</span></div><div class="alert-body"><div class="alert-status-row"><div class="alert-symbol" id="alertIcon">✓</div><div class="alert-title" id="alertTitle">正在檢查警告</div></div><div class="alert-desc" id="alertDesc">正在查詢現正生效的天氣警告及特別天氣提示</div></div><span class="widget-chevron" aria-hidden="true">›</span><div class="widget-source" id="alertsSource" title="HKO資料的成功讀取時間（香港時間）">HKO · --:--</div></section>
  <section class="card bus ios-bus kmb-v57" aria-label="九巴 272A 博研路即時到站">
    <div class="bus-topline">
-     <span class="bus-brand"><span class="widget-mini-icon icon-bus" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="3" width="16" height="16" rx="3"/><path d="M4 11h16M8 16h2m4 0h2M8 19v2m8-2v2M8 7h8"/></svg></span><span>KMB <span class="bus-brand-dot"></span> 九巴</span></span>
-     <div class="bus-update-controls"><span id="busUpdated">最後更新 --:--</span><button class="bus-refresh-icon" id="busRefresh" type="button" aria-label="重新整理九巴到站時間" title="重新整理九巴到站時間"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M20 12a8 8 0 1 0 .1 1"/></svg></button></div>
+     <span class="bus-brand widget-heading"><span class="widget-mini-icon icon-bus" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="3" width="16" height="16" rx="3"/><path d="M4 11h16M8 16h2m4 0h2M8 19v2m8-2v2M8 7h8"/></svg></span><span>KMB <span class="bus-brand-dot"></span> 九巴</span></span>
+     <div class="bus-update-controls"><button class="bus-refresh-icon" id="busRefresh" type="button" aria-label="重新整理九巴到站時間" title="重新整理九巴到站時間"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M20 12a8 8 0 1 0 .1 1"/></svg></button></div>
    </div>
    <div class="bus-hero"><div class="bus-no">272A</div><div class="bus-path"><strong>大學站</strong><span>博研路</span></div></div>
    <div class="etas eta-trio" id="etas" aria-live="polite"><div class="eta-message">正在查詢…</div></div>
    <span class="sr-only" id="busFlag" role="status">更新中</span>
- </section>
- <section class="card sun-widget" aria-label="香港日出及日落時間"><div class="section-head"><div class="section-title"><span class="ic sun-ic">🌅</span> 日照</div><span class="tag">香港</span></div><div class="sun-arc" aria-hidden="true"><svg viewBox="0 0 270 86" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="sunSky" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffd079"/><stop offset="1" stop-color="#ff9f78"/></linearGradient></defs><path d="M24 75 Q135 -67 246 75" fill="none" stroke="rgba(236,172,102,.24)" stroke-width="3.6" stroke-dasharray="0.1 8" stroke-linecap="round"/><path id="sunProgressPath" d="M24 75 Q135 -67 246 75" fill="none" stroke="url(#sunSky)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="0 500"/><line x1="16" y1="76" x2="254" y2="76" stroke="rgba(227,170,103,.3)" stroke-width="1.5" stroke-linecap="round"/><g id="sunMarker" transform="translate(24 75)"><circle r="12" fill="#ffc669" opacity=".23"/><circle r="7" fill="#ffb44b" stroke="#ffe6ab" stroke-width="2"/></g></svg></div><div class="sun-times"><div><div class="sun-label">☀ 日出</div><div class="sun-time" id="sunrise">--:--</div></div><div><div class="sun-label">☾ 日落</div><div class="sun-time" id="sunset">--:--</div></div></div></section>
- <section class="card tide-widget clickable-widget" id="tideCard" role="button" tabindex="0" aria-label="大埔滘潮汐預報，點擊查看詳細資料"><div class="section-head"><div class="section-title"><span class="ic tide-ic">🌊</span> <span id="tideWidgetTitle">大埔滘 · 潮汐</span></div><button class="widget-corner-link tide-location-edit" id="tideLocationEdit" type="button" aria-label="選擇天文台潮汐測站" title="個人化潮汐測站">↗</button></div><div class="tide-art" aria-hidden="true"><svg viewBox="0 0 280 100" preserveAspectRatio="none"><defs><linearGradient id="seaGradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#46b6df" stop-opacity=".29"/><stop offset="1" stop-color="#6198eb" stop-opacity=".025"/></linearGradient></defs><path d="M0 44 C25 24 49 65 79 43 S130 27 156 44 S204 64 229 42 S254 29 280 44 L280 100 L0 100Z" fill="url(#seaGradient)"/><path d="M0 44 C25 24 49 65 79 43 S130 27 156 44 S204 64 229 42 S254 29 280 44" stroke="#67b9e5" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div><div class="tide-summary" id="tideSummary">今日預測潮汐 · 讀取中</div><div class="tide-row" id="tides"><span class="small-note">正從香港天文台讀取…</span></div></section>
- <section class="card tasks" id="tasksCard" role="group" tabindex="0" aria-label="我的提醒，點擊空白處新增事項"><div class="section-head"><div class="section-title"><span class="ic">✅</span><span>我的提醒</span></div><span id="taskCount" class="tag">0 項</span></div><div class="rem-list" id="taskList"></div></section>
- <section class="card days-matter" id="daysMatterCard" role="group" tabindex="0" aria-label="重要日子，點擊空白處新增日期"><div class="section-head"><div class="section-title"><span class="ic">📆</span><span>重要日子</span></div><span id="daysMatterCount" class="tag">0 項</span></div><div id="daysMatterList" class="days-matter-list"><div class="days-empty">按空白位置新增紀念日</div></div></section>
- <section class="card forecast clickable-widget" id="forecastCard" role="button" tabindex="0" aria-label="查看完整九天天氣預報"><div class="section-head"><div class="section-title widget-overline"><span class="ic">☀</span> 未來天氣 <span class="tag" id="forecastTag">9 天天氣</span></div><span class="widget-chevron" aria-hidden="true">›</span></div><div class="forecast-rail" id="forecastRail"><div class="forecast-fail">正在讀取香港天文台九天天氣預報…</div></div></section>
+ <div class="widget-source" id="busUpdated" title="KMB資料的成功讀取時間（香港時間）">KMB · --:--</div></section>
+ <section class="card sun-widget" aria-label="香港日出及日落時間"><div class="section-head"><div class="section-title widget-heading"><span class="ic sun-ic">🌅</span> 日照</div><span class="tag">香港</span></div><div class="sun-arc" aria-hidden="true"><svg viewBox="0 0 270 86" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="sunSky" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffd079"/><stop offset="1" stop-color="#ff9f78"/></linearGradient></defs><path d="M24 75 Q135 -67 246 75" fill="none" stroke="rgba(236,172,102,.24)" stroke-width="3.6" stroke-dasharray="0.1 8" stroke-linecap="round"/><path id="sunProgressPath" d="M24 75 Q135 -67 246 75" fill="none" stroke="url(#sunSky)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="0 500"/><line x1="16" y1="76" x2="254" y2="76" stroke="rgba(227,170,103,.3)" stroke-width="1.5" stroke-linecap="round"/><g id="sunMarker" transform="translate(24 75)"><circle r="12" fill="#ffc669" opacity=".23"/><circle r="7" fill="#ffb44b" stroke="#ffe6ab" stroke-width="2"/></g></svg></div><div class="sun-times"><div><div class="sun-label">☀ 日出</div><div class="sun-time" id="sunrise">--:--</div></div><div><div class="sun-label">☾ 日落</div><div class="sun-time" id="sunset">--:--</div></div></div><div class="widget-source" id="sunSource" title="HKO資料的成功讀取時間（香港時間）">HKO · --:--</div></section>
+ <section class="card tide-widget clickable-widget" id="tideCard" role="button" tabindex="0" aria-label="大埔滘潮汐預報，點擊查看詳細資料"><div class="section-head"><div class="section-title widget-heading"><span class="ic tide-ic">🌊</span> <span id="tideWidgetTitle">大埔滘 · 潮汐</span></div><button class="widget-corner-link tide-location-edit" id="tideLocationEdit" type="button" aria-label="選擇天文台潮汐測站" title="個人化潮汐測站">↗</button></div><div class="tide-art" aria-hidden="true"><svg viewBox="0 0 280 100" preserveAspectRatio="none"><defs><linearGradient id="seaGradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#46b6df" stop-opacity=".29"/><stop offset="1" stop-color="#6198eb" stop-opacity=".025"/></linearGradient></defs><path d="M0 44 C25 24 49 65 79 43 S130 27 156 44 S204 64 229 42 S254 29 280 44 L280 100 L0 100Z" fill="url(#seaGradient)"/><path d="M0 44 C25 24 49 65 79 43 S130 27 156 44 S204 64 229 42 S254 29 280 44" stroke="#67b9e5" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div><div class="tide-summary" id="tideSummary">今日預測潮汐 · 讀取中</div><div class="tide-row" id="tides"><span class="small-note">正從香港天文台讀取…</span></div><div class="widget-source" id="tideSource" title="HKO資料的成功讀取時間（香港時間）">HKO · --:--</div></section>
+ <section class="card tasks" id="tasksCard" role="group" tabindex="0" aria-label="我的提醒，點擊空白處新增事項"><div class="section-head"><div class="section-title widget-heading"><span class="ic">✅</span><span>我的提醒</span></div><span id="taskCount" class="tag">0 項</span></div><div class="rem-list" id="taskList"></div></section>
+ <section class="card days-matter" id="daysMatterCard" role="group" tabindex="0" aria-label="重要日子，點擊空白處新增日期"><div class="section-head"><div class="section-title widget-heading"><span class="ic">📆</span><span>重要日子</span></div><span id="daysMatterCount" class="tag">0 項</span></div><div id="daysMatterList" class="days-matter-list"><div class="days-empty">按空白位置新增紀念日</div></div></section>
+ <section class="card forecast clickable-widget" id="forecastCard" role="button" tabindex="0" aria-label="查看完整九天天氣預報"><div class="section-head"><div class="section-title widget-overline widget-heading"><span class="ic">☀</span> 未來天氣 <span class="tag" id="forecastTag">9 天天氣</span></div><span class="widget-chevron" aria-hidden="true">›</span></div><div class="forecast-rail" id="forecastRail"><div class="forecast-fail">正在讀取香港天文台九天天氣預報…</div></div><div class="widget-source" id="forecastSource" title="HKO資料的成功讀取時間（香港時間）">HKO · --:--</div></section>
  <section class="card market market-v5 ios-hsi hsi-v56" aria-label="恒生指數第三方報價，無走勢圖"><a class="widget-corner-link hsi-detail-link" href="https://www.tradingview.com/symbols/HSI-HSI/" target="_blank" rel="noopener noreferrer" title="恒生指數詳細行情" aria-label="在 TradingView 查看恒生指數詳細報價">↗</a>
-  <div class="hsi-topline"><div class="hsi-identity"><span class="widget-mini-icon icon-hsi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m3 17 6-6 4 3 8-9"/><path d="M16 5h5v5"/></svg></span><div class="hsi-name"><strong>HSI · 恒生指數</strong></div></div><span class="hsi-venue" id="marketStatus" hidden aria-hidden="true">HKD</span></div>
+  <div class="hsi-topline"><div class="hsi-identity"><span class="widget-mini-icon icon-hsi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m3 17 6-6 4 3 8-9"/><path d="M16 5h5v5"/></svg></span><div class="hsi-name"><strong class="widget-heading">HSI · 恒生指數</strong></div></div><span class="hsi-venue" id="marketStatus" hidden aria-hidden="true">HKD</span></div>
   <div class="hsi-quote-stage market-body market-tv-body" id="marketEmbed"><div class="tv-widget-slot" id="tvWidget"><div class="tv-loading"><span>正在載入恒指報價…</span></div></div></div>
-  <div class="market-source hsi-foot"><span id="marketSource">TradingView · 可能延遲</span></div>
+  <div class="market-source hsi-foot"><span class="widget-source" id="marketSource">TradingView · --:--</span></div>
  </section>
- <section class="card news" aria-label="即時新聞"><div class="section-head"><div class="section-title"><span class="ic">📰</span> 即時新聞 <span id="newsStatus" class="tag">香港電台</span></div><div class="news-switch" id="newsSwitch"><button data-cat="local" class="active">本地</button><button data-cat="china">大中華</button><button data-cat="world">國際</button></div></div><div class="headlines" id="headlines"><div class="small-note">正在載入香港電台即時新聞…</div></div></section>
+ <section class="card news" aria-label="即時新聞"><div class="section-head"><div class="section-title widget-heading"><span class="ic">📰</span> 即時新聞 <span id="newsStatus" class="tag">香港電台</span></div><div class="news-switch" id="newsSwitch"><button data-cat="local" class="active">本地</button><button data-cat="china">大中華</button><button data-cat="world">國際</button></div></div><div class="headlines" id="headlines"><div class="small-note">正在載入香港電台即時新聞…</div></div></section>
  <section class="card tools ring-timer" id="toolsCard" aria-label="計時或倒數 Widget">
   <span class="widget-mini-icon icon-timer" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V8.5M12 2v3.5M9 2h6M18 7.5l2-2"/></svg></span>
   <div class="ring-timer-face">
@@ -1765,12 +2041,12 @@ body[data-theme="dark"] .dashboard .icon-warning{color:#e0d3ff;background:rgba(1
   <span class="sr-only" id="focusTimerStatus" role="status" aria-live="polite">05:00，已暫停</span>
  </section>
  <section class="card calendar-widget" id="calendarCard" aria-label="香港時間當月月曆" role="group">
-  <div class="calendar-top"><strong id="calendarMonth">NOVEMBER</strong><span id="calendarYear">2026</span></div>
+  <div class="calendar-top"><strong class="widget-heading" id="calendarMonth">NOVEMBER</strong><span id="calendarYear">2026</span></div>
   <div class="calendar-weekdays" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
   <div class="calendar-days" id="calendarDays" role="group" aria-label="當月日期"></div>
  </section>
 </main>
-<footer class="foot"><div>MY DAY v5.20 · GITHUB PAGES <span id="footerStatus">· 香港標準時間</span></div><div class="foot-right"><span>個人提醒只儲存於此裝置</span><a href="https://www.hko.gov.hk/tc/index.html" target="_blank" rel="noopener noreferrer">香港天文台</a><a href="https://news.rthk.hk/rthk/ch/" target="_blank" rel="noopener noreferrer">香港電台</a></div></footer>
+<footer class="foot"><div>MY DAY v5.24 · GITHUB PAGES <span id="footerStatus">· 香港標準時間</span></div><div class="foot-right"><span>個人提醒只儲存於此裝置</span><a href="https://www.hko.gov.hk/tc/index.html" target="_blank" rel="noopener noreferrer">香港天文台</a><a href="https://news.rthk.hk/rthk/ch/" target="_blank" rel="noopener noreferrer">香港電台</a></div></footer>
 </div>
 <div class="overlay" id="timerEditModal" role="dialog" aria-modal="true" aria-labelledby="timerEditTitle">
  <div class="sheet timer-edit-sheet"><div class="sheet-top"><div class="sheet-title" id="timerEditTitle">設定時間</div><button class="x" type="button" data-close="timerEditModal" aria-label="關閉">×</button></div>
@@ -1786,7 +2062,7 @@ body[data-theme="dark"] .dashboard .icon-warning{color:#e0d3ff;background:rgba(1
 <div class="overlay" id="alertInfoModal" role="dialog" aria-modal="true" aria-labelledby="alertInfoTitle"><div class="sheet"><div class="sheet-top"><div class="sheet-title" id="alertInfoTitle">香港天文台 · 警告及提示</div><button class="x" data-close="alertInfoModal" aria-label="關閉">×</button></div><div id="alertInfoDetails"></div><p class="smallprint"> <a href="https://www.hko.gov.hk/tc/index.html" target="_blank" rel="noopener noreferrer">香港天文台官方網站 ↗</a></p><button class="submit secondary-submit" id="alertToForecast">查看未來九天天氣</button></div></div>
 <div class="overlay" id="weatherLocationModal" role="dialog" aria-modal="true" aria-labelledby="weatherLocationTitle"><div class="sheet location-sheet"><div class="sheet-top"><div class="sheet-title" id="weatherLocationTitle">個人化 · 即時天氣</div><button class="x" type="button" data-close="weatherLocationModal" aria-label="關閉">×</button></div><label class="field"><span>香港天文台分區氣溫測站</span><select id="weatherLocationSelect" aria-label="選擇香港天文台氣溫測站"></select></label><p class="smallprint" id="weatherLocationNote">下拉選單根據香港天文台本港地區天氣報告 API 的實際測站更新。溫度為所選測站觀測值；天氣圖示仍為全港報告。</p><button class="submit" id="weatherLocationSave" type="button">套用地區</button></div></div>
 <div class="overlay" id="tideLocationModal" role="dialog" aria-modal="true" aria-labelledby="tideLocationTitle"><div class="sheet location-sheet"><div class="sheet-top"><div class="sheet-title" id="tideLocationTitle">個人化 · 潮汐測站</div><button class="x" type="button" data-close="tideLocationModal" aria-label="關閉">×</button></div><label class="field"><span>香港天文台天文潮汐預測測站</span><select id="tideLocationSelect" aria-label="選擇天文台天文潮汐預測測站"></select></label><p class="smallprint">顯示所選地區的預測漲／退潮時間及高度，不是即時實測水位。若天文台暫時未提供該測站的資料，會清晰標示資料暫不可用。</p><button class="submit" id="tideLocationSave" type="button">套用測站</button></div></div>
-<div class="overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="sheet"><div class="sheet-top"><div class="sheet-title" id="settingsTitle">個人化設定</div><button class="x" data-close="settingsModal" aria-label="關閉">×</button></div><div class="setting-row"><div><span>天氣地區</span><small>氣溫使用所選氣象站，濕度為全港報告</small></div><select id="weatherStation"><option value="大埔">大埔</option><option value="沙田">沙田</option><option value="香港天文台">香港天文台</option><option value="香港國際機場">香港國際機場</option></select></div><div class="setting-row"><div><span>潮汐測站</span><small>天文潮汐預測，非實測水位</small></div><select id="tideStation"><option value="TPK">大埔滘</option><option value="QUB">鰂魚涌</option><option value="CCH">長洲</option><option value="TMW">大廟灣</option></select></div><div class="setting-row"><div><span>顯示模式</span><small>iPad 風格玻璃質感</small></div><select id="themeSelect"><option value="light">淺色</option><option value="dark">深色</option><option value="auto">跟隨系統</option></select></div><div class="setting-row font-setting"><div><span>字體大小</span><small>拖曳拉桿，立即預覽全頁字體</small></div><div class="font-control"><div class="font-range-labels"><span>小</span><span>中</span><span>大</span></div><input type="range" id="fontSlider" min="0" max="2" step="1" value="1" aria-label="字體大小"><strong id="fontSizeValue">中</strong></div></div><div class="setting-row v5-data-sources"><div><span>即時資料來源</span><small>九巴 ETA：官方 API 直連<br>新聞：GitHub Actions 約每 20 分鐘同步 RSS<br>恒指：TradingView 純報價卡片（無圖表；可能延遲）</small></div><span class="tag blue-tag">免伺服器</span></div><div class="setting-row"><div><span>自動更新</span><small>九巴每 60 秒，其餘每 5 分鐘</small></div><button id="refreshToggle" class="toggle" role="switch" aria-checked="true" aria-label="自動更新"></button></div><div class="setting-row"><div><span>流暢動畫</span><small>卡片、按鈕、彈窗及切換效果</small></div><button id="motionToggle" class="toggle" role="switch" aria-checked="true" aria-label="流暢動畫"></button></div><div class="setting-row"><div><span>到時提醒聲</span><small>Safari 需要使用者先觸碰頁面啟用音效</small></div><button id="soundToggle" class="toggle" role="switch" aria-checked="false" aria-label="提醒音效"></button></div><div class="smallprint">官方來源：香港天文台、九巴即時到站、香港電台 RSS；恒指由 TradingView 第三方純報價 Widget 提供，報價可能延遲或受瀏覽器內容攔截功能影響。資料連接中斷時會顯示「暫不可用」，不會用模擬數值當成實時資訊。</div><button class="submit" data-close="settingsModal">完成</button></div></div>
+<div class="overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="sheet"><div class="sheet-top"><div class="sheet-title" id="settingsTitle">個人化設定</div><button class="x" data-close="settingsModal" aria-label="關閉">×</button></div><div class="setting-row"><div><span>天氣地區</span><small>氣溫使用所選氣象站，濕度為全港報告</small></div><select id="weatherStation"><option value="大埔">大埔</option><option value="沙田">沙田</option><option value="香港天文台">香港天文台</option><option value="香港國際機場">香港國際機場</option></select></div><div class="setting-row"><div><span>潮汐測站</span><small>天文潮汐預測，非實測水位</small></div><select id="tideStation"><option value="TPK">大埔滘</option><option value="QUB">鰂魚涌</option><option value="CCH">長洲</option><option value="TMW">大廟灣</option></select></div><div class="setting-row"><div><span>顯示模式</span><small>iPad 風格玻璃質感</small></div><select id="themeSelect"><option value="light">淺色</option><option value="dark">深色</option><option value="auto">跟隨系統</option></select></div><div class="setting-row font-setting"><div><span>字體大小</span><small>拖曳拉桿，立即預覽全頁字體</small></div><div class="font-control"><div class="font-range-labels"><span>小</span><span>中</span><span>大</span></div><input type="range" id="fontSlider" min="0" max="2" step="1" value="1" aria-label="字體大小"><strong id="fontSizeValue">中</strong></div></div><div class="setting-row v5-data-sources"><div><span>即時資料來源</span><small>新增氣壓／能見度／風：Open-Meteo 天氣模型估算（並非實測）；紫外線優先香港天文台實測，否則以模型估算。<br>九巴 ETA：官方 API 直連<br>新聞：GitHub Actions 約每 20 分鐘同步 RSS<br>恒指：TradingView 純報價卡片（無圖表；可能延遲）</small></div><span class="tag blue-tag">免伺服器</span></div><div class="setting-row"><div><span>自動更新</span><small>九巴每 60 秒，其餘每 5 分鐘</small></div><button id="refreshToggle" class="toggle" role="switch" aria-checked="true" aria-label="自動更新"></button></div><div class="setting-row"><div><span>流暢動畫</span><small>卡片、按鈕、彈窗及切換效果</small></div><button id="motionToggle" class="toggle" role="switch" aria-checked="true" aria-label="流暢動畫"></button></div><div class="setting-row"><div><span>到時提醒聲</span><small>Safari 需要使用者先觸碰頁面啟用音效</small></div><button id="soundToggle" class="toggle" role="switch" aria-checked="false" aria-label="提醒音效"></button></div><div class="smallprint">天氣模型來源：Open-Meteo（氣壓、能見度、風；紫外線可能採模型值），非天文台實測。官方來源：香港天文台、九巴即時到站、香港電台 RSS；恒指由 TradingView 第三方純報價 Widget 提供，報價可能延遲或受瀏覽器內容攔截功能影響。資料連接中斷時會顯示「暫不可用」，不會用模擬數值當成實時資訊。</div><button class="submit" data-close="settingsModal">完成</button></div></div>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id), HK='Asia/Hong_Kong';
@@ -1802,6 +2078,18 @@ function dateKey(d=new Date()){let x=dateParts(d);return x.year+'-'+x.month+'-'+
 function hhmm(t){return t?new Intl.DateTimeFormat('en-GB',{timeZone:HK,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(t)):'--:--'}
 function localDateTime(t){if(!t)return '';try{return new Intl.DateTimeFormat('zh-HK',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(t))}catch{return '未設定時間'}}
 function markText(id,text){const n=$(id),value=String(text);if(n.textContent!==value)n.textContent=value}
+// v5.23: consistent footer. Timestamp describes the data source or latest successful retrieval;
+// do NOT mistake time of retrieving a forecast/embed for the authoritative issue/quote time.
+function setWidgetSource(id,provider,time,meaning='資料時間'){
+ const n=$(id);if(!n)return;
+ let stamp='--:--';
+ if(typeof time==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(time))stamp=time;
+ else if(time!==undefined&&time!==null&&time!==''&&!Number.isNaN(new Date(time).getTime()))stamp=hhmm(time);
+ markText(id,`${provider} · ${stamp}`);
+ n.title=`${provider} · ${meaning}（香港時間）${stamp==='--:--'?'，暫無已核實時間':''}`;
+ n.dataset.sourceReady=stamp==='--:--'?'false':'true';
+}
+
 const hkShortWeekFmt=new Intl.DateTimeFormat('en-US',{timeZone:HK,weekday:'short'});
 const hkShortMonthFmt=new Intl.DateTimeFormat('en-US',{timeZone:HK,month:'short'});
 // One mark per second along the rounded-square perimeter, starting at 12 o'clock.
@@ -2189,7 +2477,7 @@ function updateTideStationHeader(){
 function selectWeatherStation(name){
  if(!name||!weatherPlaceList().includes(name))return;
  st.weatherStation=name;store('myday.settings',st);refreshLocationOptions();markText('weatherPlace',name+' · 即時天氣');
- markText('temperature','--');fetchWeather();
+ markText('temperature','--');fetchWeather();fetchMeteoMetrics();
 }
 function selectTideStation(code){
  if(!Object.prototype.hasOwnProperty.call(tideNames,code))return;
@@ -2426,21 +2714,24 @@ async function fetchWeather(){
   
   $('humidityFill').setAttribute('y',String(100-(value||0)));
   $('humidityFill').setAttribute('height',String(value||0));
-  markText('humidityHint',validRh?'HKO · '+hhmm(d.updateTime):'濕度資料暫不可用');
+  setWidgetSource('humidityHint','HKO',validRh?hhmm(d.updateTime):null,'天文台報告時間');
   markText('weatherCondition',valid?describeHKOIcon(d.icon?.[0]):'測站暫無氣溫');
   markText('weatherDesc',valid?(d.uvindex?.data?.[0]?.value?'紫外線指數 '+d.uvindex.data[0].value:'所選測站實測氣溫'):'請在 ↗ 選擇有資料的測站');
   markText('weatherIcon',formatIcon(d.icon?.[0]));
-  markText('weatherUpdated','HKO · '+hhmm(d.updateTime));
+  const receivedUV=validWeatherNumber(d.uvindex?.data?.[0]?.value);
+  hkoUV=receivedUV!==null&&receivedUV>=0&&receivedUV<=25?receivedUV:null;hkoUVTime=hhmm(d.uvindex?.recordTime||d.uvindex?.data?.[0]?.recordTime||d.updateTime);renderUV();
+  setWidgetSource('weatherUpdated','HKO',hhmm(d.updateTime),'天文台報告時間');
   okState.weather=Boolean(valid);
  }catch(e){
   if(serial!==weatherRequestSerial||selected!==st.weatherStation)return;
   markText('temperature','--');markText('weatherPlace',selected+' · 即時天氣');
   markText('weatherCondition','資料暫不可用');markText('weatherDesc','無法確認所選測站氣溫');
-  markText('weatherUpdated','連線失敗');markText('humidityHint','資料連線中斷');okState.weather=false;
+  hkoUV=null;hkoUVTime='';renderUV();
+  setWidgetSource('weatherUpdated','HKO',null,'天文台報告時間');setWidgetSource('humidityHint','HKO',null,'天文台報告時間');okState.weather=false;
  }
  updateConnection();
 }
-async function fetchWarnings(){try{const [summary,tip]=await Promise.allSettled([getData('/api/warnings',wAPI('warnsum')),getData('/api/tips',wAPI('swt'))]);if(summary.status==='rejected')throw Error('未能核實天文台警告');const d=summary.status==='fulfilled'?summary.value:{},t=tip.status==='fulfilled'?tip.value:{},items=[];Object.entries(d).forEach(([key,v])=>{if(v&&typeof v==='object'&&!Array.isArray(v)&&v.name&&v.actionCode!=='CANCEL'){items.push({title:v.name,desc:'天文台現正生效的天氣警告',type:'warning'})}});let tips=t.swt||[];if(!Array.isArray(tips))tips=[tips];tips.forEach(item=>{let s=typeof item==='string'?item:item?.desc||item?.message||'';if(s)items.push({title:'特別天氣提示',desc:String(s).replace(/<[^>]*>/g,' ').trim(),type:'tip'})});alertItems=items;$('alertsCard').classList.toggle('has-warning',items.length>0);$('alertsCard').classList.toggle('status-clear',!items.length&&tip.status==='fulfilled');$('alertsCard').classList.toggle('status-partial',!items.length&&tip.status!=='fulfilled');markText('alertIcon',items.length?'!':tip.status==='fulfilled'?'✓':'?');markText('alertTitle',items.length?items[0].title+(items.length>1?' · 另有 '+(items.length-1)+' 則提示':''):tip.status==='fulfilled'?'暫無生效警告':'警告狀態部分待核實');markText('alertDesc',items.length?items[0].desc:tip.status==='fulfilled'?'未查到生效中的警告或提示':'未查到生效警告；特別天氣提示暫未能核實');okState.warnings=true}catch(e){alertItems=[];$('alertsCard').classList.remove('has-warning','status-clear','status-partial');markText('alertIcon','?');markText('alertTitle','警告狀態暫不可用');markText('alertDesc','無法確認目前是否有警告，請到天文台官方網站核實');okState.warnings=false}updateConnection()}
+async function fetchWarnings(){try{const [summary,tip]=await Promise.allSettled([getData('/api/warnings',wAPI('warnsum')),getData('/api/tips',wAPI('swt'))]);if(summary.status==='rejected')throw Error('未能核實天文台警告');const d=summary.status==='fulfilled'?summary.value:{},t=tip.status==='fulfilled'?tip.value:{},items=[];Object.entries(d).forEach(([key,v])=>{if(v&&typeof v==='object'&&!Array.isArray(v)&&v.name&&v.actionCode!=='CANCEL'){items.push({title:v.name,desc:'天文台現正生效的天氣警告',type:'warning'})}});let tips=t.swt||[];if(!Array.isArray(tips))tips=[tips];tips.forEach(item=>{let s=typeof item==='string'?item:item?.desc||item?.message||'';if(s)items.push({title:'特別天氣提示',desc:String(s).replace(/<[^>]*>/g,' ').trim(),type:'tip'})});alertItems=items;$('alertsCard').classList.toggle('has-warning',items.length>0);$('alertsCard').classList.toggle('status-clear',!items.length&&tip.status==='fulfilled');$('alertsCard').classList.toggle('status-partial',!items.length&&tip.status!=='fulfilled');markText('alertIcon',items.length?'!':tip.status==='fulfilled'?'✓':'?');markText('alertTitle',items.length?items[0].title+(items.length>1?' · 另有 '+(items.length-1)+' 則提示':''):tip.status==='fulfilled'?'暫無生效警告':'警告狀態部分待核實');markText('alertDesc',items.length?items[0].desc:tip.status==='fulfilled'?'未查到生效中的警告或提示':'未查到生效警告；特別天氣提示暫未能核實');setWidgetSource('alertsSource','HKO',Date.now(),'警告及提示成功查詢時間（非發出時間）');okState.warnings=true}catch(e){alertItems=[];$('alertsCard').classList.remove('has-warning','status-clear','status-partial');markText('alertIcon','?');markText('alertTitle','警告狀態暫不可用');markText('alertDesc','無法確認目前是否有警告，請到天文台官方網站核實');setWidgetSource('alertsSource','HKO',null,'警告及提示成功查詢時間（非發出時間）');okState.warnings=false}updateConnection()}
 function showAlertModal(){const details=!okState.warnings?[{title:'警告狀態未能核實',desc:'目前無法連線核實天文台警告。請使用官方網站連結確認。'}]:alertItems.length?alertItems:[{title:'目前沒有生效的天氣警告',desc:'暫時沒有查到生效中的天氣警告或特別提示。資料存在更新間隔，重大天氣事件請以天文台公布為準。'}];$('alertInfoDetails').innerHTML=details.map(x=>'<div class="setting-row" style="display:block"><span>'+safe(x.title)+'</span><small style="display:block;line-height:1.7;margin-top:7px">'+safe(x.desc)+'</small></div>').join('');openModal('alertInfoModal')}
 $('alertToForecast').addEventListener('click',()=>{closeModal('alertInfoModal');setTimeout(()=>openModal('forecastModal'),230)});
 $('alertsCard').addEventListener('click',showAlertModal);
@@ -2475,7 +2766,7 @@ function updateSunArc(s){
 }
 let tideEvents=[];
 let astronomyRequestSerial=0;
-async function fetchAstronomy(){const serial=++astronomyRequestSerial,station=st.tideStation;updateTideStationHeader();const x=dateParts(),query='year='+x.year+'&rformat=json';const sources=[['/api/sun?year='+x.year,'https://data.weather.gov.hk/weatherAPI/opendata/opendata.php?dataType=SRS&'+query],['/api/tides?year='+x.year+'&station='+st.tideStation,'https://data.weather.gov.hk/weatherAPI/opendata/opendata.php?dataType=HLT&station='+st.tideStation+'&'+query]];const [sun,tides]=await Promise.allSettled(sources.map(([proxy,dir])=>getData(proxy,dir)));if(serial!==astronomyRequestSerial||station!==st.tideStation)return;if(sun.status==='fulfilled'){let s=parseSRS(sun.value);markText('sunrise',s?.sunrise||'--:--');markText('sunset',s?.sunset||'--:--');updateSunArc(s)}else if($('sunrise').textContent==='--:--'){updateSunArc(null)}if(tides.status==='fulfilled'){const t=parseTides(tides.value);tideEvents=t;const name=tideNames[st.tideStation]||'大埔滘';markText('tideModalTitle','今日潮汐 · '+name);if(t.length){const nowM=Number(x.hour)*60+Number(x.minute),upcoming=t.filter(z=>{const [h,m]=z.time.split(':').map(Number);return h*60+m>=nowM});const shown=(upcoming.length?upcoming:t).slice(0,2);markText('tideSummary',upcoming.length?'即將到來 · 天文潮汐預測':'今日潮汐 · '+t.length+' 個潮汐時段');const html=shown.map(z=>`<div class="tide-chip"><div class="tide-type">${safe(z.type==='漲潮'?'▲ 漲潮':z.type==='退潮'?'▼ 退潮':z.type)}</div><div class="tide-val">${safe(z.time)}</div><div class="tide-height">${Number(z.height).toFixed(1)} m</div></div>`).join('');if($('tides').innerHTML!==html)$('tides').innerHTML=html;$('tideModalList').innerHTML=t.map(z=>`<div class="tide-modal-row"><span>${z.type==='漲潮'?'🌊':'〰'}</span><div>${safe(z.type)}</div><strong>${safe(z.time)} <span>${Number(z.height).toFixed(1)} m</span></strong></div>`).join('')}else{markText('tideSummary','今日未取得潮汐預報');$('tides').innerHTML='<span class="small-note">今日潮汐預測暫缺</span>';$('tideModalList').innerHTML='<span class="small-note">今天沒有可用的潮汐時間。</span>'}}else{tideEvents=[];markText('tideSummary','潮汐預測連線中斷');$('tides').innerHTML='<span class="small-note">潮汐資料未能連接</span>';}}
+async function fetchAstronomy(){const serial=++astronomyRequestSerial,station=st.tideStation;updateTideStationHeader();const x=dateParts(),query='year='+x.year+'&rformat=json';const sources=[['/api/sun?year='+x.year,'https://data.weather.gov.hk/weatherAPI/opendata/opendata.php?dataType=SRS&'+query],['/api/tides?year='+x.year+'&station='+st.tideStation,'https://data.weather.gov.hk/weatherAPI/opendata/opendata.php?dataType=HLT&station='+st.tideStation+'&'+query]];const [sun,tides]=await Promise.allSettled(sources.map(([proxy,dir])=>getData(proxy,dir)));if(serial!==astronomyRequestSerial||station!==st.tideStation)return;if(sun.status==='fulfilled'){let s=parseSRS(sun.value);markText('sunrise',s?.sunrise||'--:--');markText('sunset',s?.sunset||'--:--');updateSunArc(s);setWidgetSource('sunSource','HKO',s?.sunrise&&s?.sunset?Date.now():null,'日出日落預測成功讀取時間（非發布時間）')}else{setWidgetSource('sunSource','HKO',null,'日出日落預測成功讀取時間（非發布時間）');if($('sunrise').textContent==='--:--')updateSunArc(null)}if(tides.status==='fulfilled'){const t=parseTides(tides.value);tideEvents=t;setWidgetSource('tideSource','HKO',t.length?Date.now():null,'潮汐預測成功讀取時間（非發布時間）');const name=tideNames[st.tideStation]||'大埔滘';markText('tideModalTitle','今日潮汐 · '+name);if(t.length){const nowM=Number(x.hour)*60+Number(x.minute),upcoming=t.filter(z=>{const [h,m]=z.time.split(':').map(Number);return h*60+m>=nowM});const shown=(upcoming.length?upcoming:t).slice(0,2);markText('tideSummary',upcoming.length?'即將到來 · 天文潮汐預測':'今日潮汐 · '+t.length+' 個潮汐時段');const html=shown.map(z=>`<div class="tide-chip"><div class="tide-type">${safe(z.type==='漲潮'?'▲ 漲潮':z.type==='退潮'?'▼ 退潮':z.type)}</div><div class="tide-val">${safe(z.time)}</div><div class="tide-height">${Number(z.height).toFixed(1)} m</div></div>`).join('');if($('tides').innerHTML!==html)$('tides').innerHTML=html;$('tideModalList').innerHTML=t.map(z=>`<div class="tide-modal-row"><span>${z.type==='漲潮'?'🌊':'〰'}</span><div>${safe(z.type)}</div><strong>${safe(z.time)} <span>${Number(z.height).toFixed(1)} m</span></strong></div>`).join('')}else{markText('tideSummary','今日未取得潮汐預報');$('tides').innerHTML='<span class="small-note">今日潮汐預測暫缺</span>';$('tideModalList').innerHTML='<span class="small-note">今天沒有可用的潮汐時間。</span>'}}else{setWidgetSource('tideSource','HKO',null,'潮汐預測成功讀取時間（非發布時間）');tideEvents=[];markText('tideSummary','潮汐預測連線中斷');$('tides').innerHTML='<span class="small-note">潮汐資料未能連接</span>';}}
 $('tideCard').addEventListener('click',()=>openModal('tideModal'));
 $('tideCard').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openModal('tideModal')}});
 
@@ -2562,7 +2853,7 @@ function displayBus(d){
   const now=Date.now();
   const count=renderBusArrivals(d.arrivals,now,false);
   lastKmbSuccessAt=now;
-  markText('busUpdated','最後更新 '+hhmm(now));
+  setWidgetSource('busUpdated','KMB',now,'九巴 ETA 最近成功查詢時間');
   markText('busFlag',count?'即時到站資料已更新':'暫無班次');
   $('busRefresh').title='重新整理九巴到站時間';
 }
@@ -2640,7 +2931,7 @@ function renderForecast(days){const rail=$('forecastRail'),items=days.slice(0,6)
 const cards=rail.querySelectorAll('.forecast-day');items.forEach((x,i)=>{const el=cards[i];if(el.title!==x.weather)el.title=x.weather;const parts=[['.forecast-week',shortDay(x)],['.forecast-date',Number(x.date.slice(4,6))+'/'+Number(x.date.slice(6,8))],['.forecast-emoji',forecastEmoji(x.icon)],['.forecast-temps strong',(x.max??'--')+'°'],['.forecast-temps span',(x.min??'--')+'°'],['.forecast-rain',x.rain&&x.rain!=='-'?'雨 '+x.rain:'香港天文台']];for(const [selector,value] of parts){const n=el.querySelector(selector);if(n.textContent!==String(value))n.textContent=String(value)}});
 const detailSig=JSON.stringify(days);if(detailSig!==forecastDetailSignature){forecastDetailSignature=detailSig;$('forecastDetails').innerHTML=days.map(x=>`<div class="forecast-detail-row"><span class="detail-day">${safe(shortDay(x))}<small style="display:block;font-weight:500;color:var(--muted)">${Number(x.date.slice(4,6))}/${Number(x.date.slice(6,8))}</small></span><span style="font-size:22px">${forecastEmoji(x.icon)}</span><span class="detail-temps">${x.max??'--'}° / ${x.min??'--'}°</span><span class="detail-desc">${safe(x.weather)}${x.rain?' · 顯著降雨概率：'+safe(x.rain):''}${x.maxRh!=null?' · 濕度 '+x.minRh+'–'+x.maxRh+'%':''}</span></div>`).join('')}}
 let forecastFetching=false;
-async function fetchForecast(){if(forecastFetching)return;forecastFetching=true;try{const d=await getData('/api/forecast',wAPI('fnd'));const next=cleanForecast(d);if(!next.length)throw Error('空預報');forecastDays=next;const sig=JSON.stringify(next);if(sig!==forecastSignature||!$('forecastRail').querySelector('.forecast-day')){renderForecast(next);forecastSignature=sig}markText('forecastTag','9 天 · HKO');if(d.updateTime)markText('forecastModalFooter','香港天文台 · 最後發布 '+hhmm(d.updateTime)+' · 氣溫為全港預測');okState.forecast=true}catch(e){if(!forecastDays.length){$('forecastRail').innerHTML='<div class="forecast-fail">九天天氣暫不可用 · 請檢查網絡</div>';$('forecastDetails').innerHTML='<div class="small-note">九天天氣資料暫不可用，請稍後重新載入。</div>';markText('forecastTag','暫不可用')}else markText('forecastTag','顯示上次預報');okState.forecast=false}finally{forecastFetching=false;updateConnection()}}
+async function fetchForecast(){if(forecastFetching)return;forecastFetching=true;try{const d=await getData('/api/forecast',wAPI('fnd'));const next=cleanForecast(d);if(!next.length)throw Error('空預報');forecastDays=next;const sig=JSON.stringify(next);if(sig!==forecastSignature||!$('forecastRail').querySelector('.forecast-day')){renderForecast(next);forecastSignature=sig}markText('forecastTag','9 天 · HKO');setWidgetSource('forecastSource','HKO',d.updateTime||Date.now(),d.updateTime?'天文台預報發布時間':'預報成功讀取時間（非發布時間）');if(d.updateTime)markText('forecastModalFooter','香港天文台 · 最後發布 '+hhmm(d.updateTime)+' · 氣溫為全港預測');okState.forecast=true}catch(e){if(!forecastDays.length){$('forecastRail').innerHTML='<div class="forecast-fail">九天天氣暫不可用 · 請檢查網絡</div>';$('forecastDetails').innerHTML='<div class="small-note">九天天氣資料暫不可用，請稍後重新載入。</div>';markText('forecastTag','暫不可用');setWidgetSource('forecastSource','HKO',null,'預報發布時間')}else markText('forecastTag','顯示上次預報');okState.forecast=false}finally{forecastFetching=false;updateConnection()}}
 $('forecastCard').addEventListener('click',()=>openModal('forecastModal'));
 $('forecastCard').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openModal('forecastModal')}});
 // ── Hang Seng Index · delayed quote + intraday sparkline ───────────────
@@ -2661,17 +2952,17 @@ function mountTradingView(force=false){
   script.type='text/javascript';script.async=true;
   script.src='https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js';
   script.textContent=JSON.stringify({symbol:'HSI:HSI',width:'100%',locale:'zh_TW',colorTheme:theme,isTransparent:true});
-  script.onerror=()=>{markText('marketStatus','未連線');markText('marketSource','請按「完整圖表」查看');okState.market=false;updateConnection()};
+  script.onerror=()=>{markText('marketStatus','未連線');setWidgetSource('marketSource','TradingView',null,'嵌入載入時間（不是報價時間）');okState.market=false;updateConnection()};
   wrapper.appendChild(script);
   // We can observe the embed container but cannot inspect third-party quote content.
   let cycles=0;const poll=setInterval(()=>{
     if(!host.isConnected){clearInterval(poll);return}
     if(host.querySelector('iframe')){
       const loading=host.querySelector('.tv-loading');if(loading)loading.remove();
-      markText('marketStatus','HKD');markText('marketSource','TradingView · 價格可能延遲');
+      markText('marketStatus','HKD');setWidgetSource('marketSource','TradingView',Date.now(),'嵌入載入時間（不是報價時間，價格可能延遲）');
       okState.market=true;updateConnection();clearInterval(poll);
     }else if(++cycles>=25){
-      markText('marketStatus','未連線');markText('marketSource','無法確認第三方行情是否載入');okState.market=false;updateConnection();clearInterval(poll);
+      markText('marketStatus','未連線');setWidgetSource('marketSource','TradingView',null,'嵌入載入時間（不是報價時間）');okState.market=false;updateConnection();clearInterval(poll);
     }
   },400);
 }
@@ -2681,9 +2972,259 @@ const themeWatcher=new MutationObserver(()=>{
   if(tradingViewStarted&&tvTheme()!==currentTVTheme)mountTradingView(true);
 });themeWatcher.observe(document.body,{attributes:true,attributeFilter:['data-theme']});
 
-function refreshAll(){fetchWeather();fetchForecast();fetchMarket();fetchWarnings();fetchAstronomy();fetchBus();fetchNews()}
+
+// ── v5.21 automatic full-viewport pagination ─────────────────────────────
+const dashboardMain=document.querySelector('main.dashboard');
+const dashboardCards=[...dashboardMain.children].filter(n=>n.classList.contains('card'));
+// Forecast and headlines have always been wider panels. Every other widget is 1:1.
+dashboardCards.forEach(card=>{if(card.classList.contains('forecast')||card.classList.contains('news'))card.dataset.pageSpan='2';});
+const dashboardViewport=document.createElement('div');
+dashboardViewport.className='dashboard-viewport';
+dashboardViewport.id='dashboardViewport';
+const dashboardTrack=document.createElement('div');
+dashboardTrack.className='dashboard-track';dashboardTrack.id='dashboardTrack';
+dashboardMain.parentNode.insertBefore(dashboardViewport,dashboardMain);
+dashboardViewport.appendChild(dashboardTrack);dashboardTrack.appendChild(dashboardMain);
+const pageNavigation=document.createElement('nav');pageNavigation.className='page-navigation';pageNavigation.id='pageNavigation';pageNavigation.hidden=true;pageNavigation.setAttribute('aria-label','Dashboard 換頁');
+pageNavigation.innerHTML='<button type="button" class="page-nav-button" id="pagePrev" aria-label="上一頁">⌃</button><div class="page-nav-dots" id="pageDots"></div><span class="page-counter" id="pageCount" aria-live="polite">1 / 1</span><button type="button" class="page-nav-button" id="pageNext" aria-label="下一頁">⌄</button>'; 
+dashboardViewport.appendChild(pageNavigation); // v5.22: a vertical right-edge rail, outside card flow
+let pageIndex=0,pageList=[],pageFitSignature='',pageRebuildFrame=0,lastPageWheel=0;
+function packDashboardCards(cols,rows){
+ const groups=[[]];let group=groups[0],line=0,row=0;
+ for(const card of dashboardCards){
+  const span=Math.min(cols,Number(card.dataset.pageSpan)||1);
+  if(line+span>cols){row++;line=0;}
+  if(row>=rows){group=[];groups.push(group);row=0;line=0;}
+  group.push(card);line+=span;
+  if(line>=cols){row++;line=0;}
+ }
+ return groups;
+}
+function choosePageGrid(width,height){
+ const gap=8;
+ // On narrower screens preserve two-up squares; on iPad keep comfortable touch targets.
+ const minTile=width<360?133:width<500?143:width<680?155:165;
+ const maxCols=Math.min(dashboardCards.length,Math.max(1,Math.floor((width+gap)/(minTile+gap))));
+ const maxRows=Math.min(dashboardCards.length,Math.max(1,Math.floor((height+gap)/(minTile+gap))));
+ let chosen=null;
+ for(let cols=1;cols<=maxCols;cols++)for(let rows=1;rows<=maxRows;rows++){
+  const tile=Math.floor(Math.min((width-6-(cols-1)*gap)/cols,(height-6-(rows-1)*gap)/rows));
+  if(tile<minTile)continue;
+  const pages=packDashboardCards(cols,rows),n=pages.length;
+  // First favour fewer pages; for equal page count favour legible, larger square cards.
+  // Tiny differences in tile size do not outweigh a substantially fuller first page.
+  const score=tile + Math.min(18,cols*rows)*.23;
+  if(!chosen||n<chosen.pages.length||(n===chosen.pages.length&&(score>chosen.score||score===chosen.score&&cols>chosen.cols)))
+   chosen={cols,rows,tile,pages,score};
+ }
+ if(chosen)return chosen;
+ const tile=Math.max(70,Math.floor(Math.min(width-6,height-6)));
+ return {cols:1,rows:1,tile,pages:packDashboardCards(1,1),score:tile};
+}
+function jumpPage(next,animate=true){
+ if(!pageList.length)return;
+ pageIndex=Math.min(pageList.length-1,Math.max(0,next));
+ if(!animate){dashboardTrack.style.transition='none';}
+ dashboardTrack.style.transform=`translate3d(0,${-pageIndex*100}%,0)`;
+ if(!animate)requestAnimationFrame(()=>{dashboardTrack.style.removeProperty('transition');});
+ pageList.forEach((p,i)=>{p.setAttribute('aria-hidden',String(i!==pageIndex));p.inert=i!==pageIndex;});
+ $('pageCount').textContent=`${pageIndex+1} / ${pageList.length}`;
+ $('pagePrev').disabled=pageIndex===0;$('pageNext').disabled=pageIndex===pageList.length-1;
+ [...$('pageDots').children].forEach((el,i)=>{if(i===pageIndex)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});
+}
+function rebuildDashboardPages(){
+ const width=dashboardViewport.clientWidth,height=dashboardViewport.clientHeight;
+ if(width<50||height<50)return;
+ const basicFit=choosePageGrid(width,height);
+ // Reserve an untouchable strip for the vertical dots only when pages actually exist.
+ const fit=basicFit.pages.length>1?choosePageGrid(Math.max(100,width-(width<360?20:27)),height):basicFit;
+ const signature=[width,height,fit.cols,fit.rows,fit.tile,fit.pages.length].join(':');
+ if(signature===pageFitSignature)return;
+ pageFitSignature=signature;
+ // Move existing nodes: no recreation, event handlers and user data are preserved.
+ dashboardMain.replaceChildren();
+ dashboardTrack.replaceChildren(dashboardMain);
+ pageList=fit.pages.map((group,i)=>{
+  const page=i===0?dashboardMain:document.createElement('section');
+  page.className='dashboard page-grid dashboard-page';
+  page.dataset.page=String(i+1);
+  page.style.setProperty('--page-cols',fit.cols);
+  page.style.setProperty('--page-rows',fit.rows);
+  page.style.setProperty('--page-tile',fit.tile+'px');
+  page.style.setProperty('--page-gap','8px');
+  if(i>0){page.setAttribute('role','group');page.setAttribute('aria-label',`Dashboard 第 ${i+1} 頁`);dashboardTrack.appendChild(page);}
+  page.append(...group);
+  return page;
+ });
+ pageNavigation.hidden=pageList.length<=1;
+ document.body.classList.toggle('has-dashboard-pages',pageList.length>1);
+ $('pageDots').replaceChildren(...pageList.map((_,i)=>{
+  const b=document.createElement('button');b.type='button';b.className='page-nav-dot';b.setAttribute('aria-label',`前往第 ${i+1} 頁`);b.addEventListener('click',()=>jumpPage(i));return b;
+ }));
+ jumpPage(pageIndex,false);
+ lastTimerFit='';fitFocusTimerLabel();
+}
+function requestPageRebuild(){if(pageRebuildFrame)return;pageRebuildFrame=requestAnimationFrame(()=>{pageRebuildFrame=0;rebuildDashboardPages()});}
+$('pagePrev').addEventListener('click',()=>jumpPage(pageIndex-1));
+$('pageNext').addEventListener('click',()=>jumpPage(pageIndex+1));
+function isModalOpen(){return Boolean(document.querySelector('.overlay.open'))||Boolean($('timerFinishOverlay')&&!$('timerFinishOverlay').hidden);}
+function hasNestedScroll(el,delta){
+ for(let node=el;node&&node!==dashboardViewport;node=node.parentElement){
+  if(node.matches?.('.rem-list,.days-matter-list,.headlines,.sheet,.forecast-rail')&&node.scrollHeight>node.clientHeight+5){
+   if(delta>0&&node.scrollTop+node.clientHeight<node.scrollHeight-2)return true;
+   if(delta<0&&node.scrollTop>2)return true;
+  }
+ }
+ return false;
+}
+let swipeStart=null;
+dashboardViewport.addEventListener('touchstart',e=>{
+ if(e.touches.length!==1||isModalOpen()){swipeStart=null;return;}
+ const t=e.touches[0];swipeStart={x:t.clientX,y:t.clientY,target:e.target};
+},{passive:true});
+dashboardViewport.addEventListener('touchend',e=>{
+ if(!swipeStart||!e.changedTouches.length||isModalOpen())return;
+ const t=e.changedTouches[0],dy=t.clientY-swipeStart.y,dx=t.clientX-swipeStart.x,start=swipeStart;swipeStart=null;
+ if(Math.abs(dy)<55||Math.abs(dy)<Math.abs(dx)*1.25||hasNestedScroll(start.target,-dy))return;
+ if(dy<0)jumpPage(pageIndex+1);else jumpPage(pageIndex-1);
+},{passive:true});
+dashboardViewport.addEventListener('touchcancel',()=>{swipeStart=null},{passive:true});
+dashboardViewport.addEventListener('wheel',e=>{
+ if(isModalOpen()||Math.abs(e.deltaY)<9||Math.abs(e.deltaY)<Math.abs(e.deltaX)*1.2||hasNestedScroll(e.target,e.deltaY))return;
+ const now=Date.now();if(now-lastPageWheel<720)return;
+ const old=pageIndex;jumpPage(pageIndex+(e.deltaY>0?1:-1));
+ if(old!==pageIndex){lastPageWheel=now;e.preventDefault();}
+},{passive:false});
+document.addEventListener('keydown',e=>{
+ if(isModalOpen()||e.altKey||e.ctrlKey||e.metaKey||e.target.closest('input,textarea,select,button,a,[contenteditable="true"]'))return;
+ if(['PageDown','ArrowDown'].includes(e.key)){e.preventDefault();jumpPage(pageIndex+1);}
+ if(['PageUp','ArrowUp'].includes(e.key)){e.preventDefault();jumpPage(pageIndex-1);}
+});
+const pageResizeObserver=new ResizeObserver(requestPageRebuild);pageResizeObserver.observe(dashboardViewport);
+window.addEventListener('orientationchange',requestPageRebuild,{passive:true});
+window.addEventListener('resize',requestPageRebuild,{passive:true});
+rebuildDashboardPages();
+
+// ── v5.21 real API, never invented weather observations ────────────────
+const weatherCoords={
+ '大埔':[22.450,114.172],'沙田':[22.382,114.191],'香港天文台':[22.302,114.174],
+ '香港國際機場':[22.310,113.915],'赤鱲角':[22.310,113.915],'長洲':[22.209,114.030],
+ '屯門':[22.393,113.973],'元朗':[22.444,114.023],'上水':[22.503,114.127],
+ '粉嶺':[22.492,114.140],'西貢':[22.382,114.272],'將軍澳':[22.307,114.260],
+ '筲箕灣':[22.278,114.233],'黃竹坑':[22.248,114.173],'深水埗':[22.331,114.163],
+ '黃大仙':[22.343,114.193],'打鼓嶺':[22.529,114.157],'大美督':[22.472,114.233],
+ '流浮山':[22.469,113.984],'北潭涌':[22.401,114.322],'昂坪':[22.256,113.906],
+ '坪洲':[22.285,114.038],'京士柏':[22.311,114.173],'赤柱':[22.218,114.213],
+ '大帽山':[22.412,114.123],'跑馬地':[22.268,114.185],'觀塘':[22.311,114.226],
+ '荃灣':[22.369,114.119],'九龍城':[22.332,114.191],'大嶼山':[22.260,113.945]
+};
+let metricsSerial=0,modelUV=null,modelUVTime='',hkoUV=null,hkoUVTime='';
+const validWeatherNumber=value=>value!==null&&value!==undefined&&String(value).trim()!==''&&Number.isFinite(Number(value))?Number(value):null;
+function renderUV(){
+ const hko=hkoUV!==null,uv=hko?hkoUV:modelUV;
+ markText('uvValue',uv===null?'--':Number(uv.toFixed(1)).toString());
+ const level=uv===null?'資料暫不可用':uv<3?'低 · Low':uv<6?'中等 · Moderate':uv<8?'高 · High':uv<11?'甚高 · Very high':'極高 · Extreme';
+ markText('uvDesc',level);
+ const message=uv===null?'資料暫不可用':uv<3?'日常外出，按需要防曬':uv<6?'外出宜使用防曬用品':uv<8?'注意遮陽，避免長時間曝曬':uv<11?'減少正午時段戶外曝曬':'避免直接曝曬，做好全面防護';
+ markText('uvAdvice',message);
+ const pointer=$('uvPointer');pointer.hidden=uv===null;
+ if(uv!==null)pointer.style.left=`${Math.max(1,Math.min(99,uv/14*100))}%`;
+ $('uvValue').closest('.meteo-uv').dataset.uvLevel=uv===null?'unknown':uv<3?'low':uv<6?'medium':uv<8?'high':uv<11?'very-high':'extreme';
+ if(uv===null)setWidgetSource('uvSource','HKO / Open-Meteo',null,'紫外線數據時間');else if(hko)setWidgetSource('uvSource','HKO',hkoUVTime,'天文台紫外線觀測時間');else setWidgetSource('uvSource','Open-Meteo',modelUVTime,'紫外線模型時段（非實測）');
+}
+// v5.22: responsive vector gauges, preserving weather source / failure semantics.
+function drawMeteorologicalGauges(){
+ const ns='http://www.w3.org/2000/svg';
+ const addTick=(parent,x1,y1,x2,y2,cls)=>{
+  const line=document.createElementNS(ns,'line');
+  for(const [k,v] of Object.entries({x1,y1,x2,y2}))line.setAttribute(k,String(Number(v.toFixed(2))));
+  line.setAttribute('class',cls);parent.appendChild(line);return line;
+ };
+ const pressure=$('pressureTicks');
+ for(let i=0;i<=52;i++){
+  const a=(160+i*220/52)*Math.PI/180,r1=i%5===0?65:69,r2=78;
+  addTick(pressure,90+r1*Math.cos(a),102+r1*Math.sin(a),90+r2*Math.cos(a),102+r2*Math.sin(a),'pressure-tick');
+ }
+ const wind=$('windTicks');
+ for(let i=0;i<72;i++){
+  const a=i*5*Math.PI/180,major=i%9===0,inner=major?63:68,outer=major?73:74;
+  addTick(wind,90+inner*Math.cos(a),90+inner*Math.sin(a),90+outer*Math.cos(a),90+outer*Math.sin(a),major?'wind-tick is-major':'wind-tick');
+ }
+}
+drawMeteorologicalGauges();
+function displayPressureGauge(hPa,currentTime,hourly){
+ const kPa=hPa/10;
+ markText('pressureValue',kPa.toFixed(1));
+ const ratio=Math.max(0,Math.min(1,(hPa-980)/60));
+ const angle=160+ratio*220;
+ $('pressureNeedle').setAttribute('transform',`rotate(${angle-270} 90 102)`);
+ $('pressureNeedle').style.opacity='1';
+ const marked=Math.round(ratio*52);
+ [...$('pressureTicks').children].forEach((node,i)=>node.classList.toggle('is-lit',i<=marked));
+ let older=null;
+ if(Array.isArray(hourly?.time)&&Array.isArray(hourly?.pressure_msl)){
+  const current=modelHkTime(currentTime);
+  for(let i=0;i<hourly.time.length;i++){
+   const stamp=modelHkTime(hourly.time[i]),n=validWeatherNumber(hourly.pressure_msl[i]);
+   if(stamp!==null&&current-stamp>=45*60000&&current-stamp<=3*3600000&&n!==null&&n>=870&&n<=1100)
+    if(!older||stamp>older.stamp)older={stamp,value:n};
+  }
+ }
+ const diff=older?hPa-older.value:null,arrow=diff===null?'—':diff>=0.5?'↑':diff<=-0.5?'↓':'→';
+ markText('pressureTrend',arrow);
+ $('pressureTrend').title=diff===null?'暫無可比較的較早氣壓資料':`較前一時段 ${diff>=0?'+':''}${diff.toFixed(1)} hPa（模型）`;
+ $('pressureTrend').dataset.trend=arrow==='↑'?'up':arrow==='↓'?'down':'neutral';
+}
+function compassName(deg){const values=['北','東北偏北','東北','東北偏東','東','東南偏東','東南','東南偏南','南','西南偏南','西南','西南偏西','西','西北偏西','西北','西北偏北'];return values[Math.round(deg/22.5)%16]}
+function modelHkTime(time){if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(time||''))return null;return new Date(time.slice(0,16)+':00+08:00').getTime();}
+function localTimeShort(time){return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(time||'')?time.slice(11,16):'--:--';}
+function showMeteoFail(id){markText(id+'Value','--');setWidgetSource(id+'Source','Open-Meteo',null,'天氣模型時段（非實測）');if(id==='pressure'){markText('pressureTrend','—');$('pressureTrend').title='暫無可比較的氣壓資料';[...$('pressureTicks').children].forEach(x=>x.classList.remove('is-lit'));$('pressureNeedle').removeAttribute('transform');$('pressureNeedle').style.opacity='0';}if(id==='wind'){markText('windGust','陣風 --');$('windArrow').style.opacity='0';}}
+async function fetchMeteoMetrics(){
+ const serial=++metricsSerial,station=st.weatherStation;
+ const coords=weatherCoords[station]||weatherCoords['香港天文台'];
+ const placeNote=weatherCoords[station]?station:'香港區域';
+ const url=`https://api.open-meteo.com/v1/forecast?latitude=${coords[0]}&longitude=${coords[1]}&current=pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=visibility,uv_index,pressure_msl&past_hours=3&forecast_hours=3&timezone=Asia%2FHong_Kong&wind_speed_unit=kmh`;
+ try{
+  const d=await getData('/api/metrics',url,10000);
+  if(serial!==metricsSerial||station!==st.weatherStation)return;
+  const c=d?.current||{},time=c.time||'';
+  const currentMs=modelHkTime(time);
+  if(!Number.isFinite(currentMs)||Math.abs(Date.now()-currentMs)>4*3600000)throw Error('模型資料時間不合理');
+  const stamp=localTimeShort(time);
+  const pressure=validWeatherNumber(c.pressure_msl);
+  if(pressure!==null&&pressure>=870&&pressure<=1100){displayPressureGauge(pressure,time,d?.hourly);setWidgetSource('pressureSource','Open-Meteo',stamp,'氣壓模型時段（非實測）');}else showMeteoFail('pressure');
+  const speed=validWeatherNumber(c.wind_speed_10m),dir=validWeatherNumber(c.wind_direction_10m);
+  if(speed!==null&&speed>=0&&speed<400&&dir!==null&&dir>=0&&dir<=360){
+   markText('windValue',String(Math.round(speed)));
+   markText('windDesc',`${compassName(dir)}風${speed<1?' · 微風':''}`);
+   // Open-Meteo wind direction is FROM; the dot marks source, arrow shows flow TO.
+   $('windArrow').setAttribute('transform',`rotate(${dir-90} 90 90)`);
+   $('windArrow').style.opacity='1';
+   const gust=validWeatherNumber(c.wind_gusts_10m);
+   markText('windGust',gust!==null&&gust>=0&&gust<400?`陣風 ${Math.round(gust)} km/h`:'陣風 --');
+   setWidgetSource('windSource','Open-Meteo',stamp,'風速及風向模型時段（非實測）');
+  }else{showMeteoFail('wind');markText('windDesc','模型風向暫不可用');}
+  const times=d?.hourly?.time,visibility=d?.hourly?.visibility,uv=d?.hourly?.uv_index;
+  const now=Date.now();let index=-1,dist=Infinity;
+  if(Array.isArray(times))times.forEach((t,i)=>{const ts=modelHkTime(t),diff=ts===null?Infinity:Math.abs(now-ts);if(diff<dist){index=i;dist=diff;}});
+  const usable=index>=0&&dist<=3*3600000;
+  const vis=usable&&Array.isArray(visibility)?validWeatherNumber(visibility[index]):null;
+  if(vis!==null&&vis>=0&&vis<=150000){const km=vis/1000;markText('visibilityValue',km<100?km.toFixed(1):String(Math.round(km)));markText('visibilityDesc',`${placeNote} · 預估視程`);setWidgetSource('visibilitySource','Open-Meteo',localTimeShort(times[index]),'能見度模型時段（非實測）');}else{showMeteoFail('visibility');markText('visibilityDesc','模型視程暫不可用');}
+  modelUV=usable&&Array.isArray(uv)?validWeatherNumber(uv[index]):null;
+  if(modelUV!==null&&(modelUV<0||modelUV>25))modelUV=null;
+  modelUVTime=usable?localTimeShort(times[index]):'';
+  renderUV();
+ }catch(e){
+  if(serial!==metricsSerial||station!==st.weatherStation)return;
+  for(const id of ['pressure','visibility','wind'])showMeteoFail(id);
+  markText('windDesc','模型風向暫不可用');markText('visibilityDesc','模型視程暫不可用');
+  modelUV=null;modelUVTime='';renderUV();console.warn('Open-Meteo metrics:',e.message);
+ }
+}
+
+function refreshAll(){fetchMeteoMetrics();fetchWeather();fetchForecast();fetchMarket();fetchWarnings();fetchAstronomy();fetchBus();fetchNews()}
 $('refreshBtn').addEventListener('click',()=>{const b=$('refreshBtn');b.style.transform='rotate(180deg)';setTimeout(()=>b.style.transform='',400);refreshAll();showToast('已要求更新全部即時資料')});
-if(focusTimer.completed)setTimerFinishedAlert(true);renderTasks();renderDaysMatter();initSecondRing();tickClock();paintFocusTimer();tickSecondAligned();ensureTimerAnimation();refreshAll();setInterval(()=>{if(st.autoRefresh&&document.visibilityState==='visible')fetchBus()},60000);setInterval(()=>{if(st.autoRefresh&&document.visibilityState==='visible')fetchMarket()},90000);setInterval(()=>{if(st.autoRefresh&&document.visibilityState==='visible'){fetchWeather();fetchForecast();fetchWarnings();fetchAstronomy();fetchNews()}},300000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){tickClock();paintFocusTimer();ensureTimerAnimation();if(st.autoRefresh)refreshAll()}});
+if(focusTimer.completed)setTimerFinishedAlert(true);renderTasks();renderDaysMatter();initSecondRing();tickClock();paintFocusTimer();tickSecondAligned();ensureTimerAnimation();refreshAll();setInterval(()=>{if(st.autoRefresh&&document.visibilityState==='visible')fetchBus()},60000);setInterval(()=>{if(st.autoRefresh&&document.visibilityState==='visible')fetchMarket()},90000);setInterval(()=>{if(st.autoRefresh&&document.visibilityState==='visible'){fetchMeteoMetrics();fetchWeather();fetchForecast();fetchWarnings();fetchAstronomy();fetchNews()}},300000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){tickClock();paintFocusTimer();ensureTimerAnimation();if(st.autoRefresh)refreshAll()}});
 })();
 </script>
 </body>
